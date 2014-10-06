@@ -46,7 +46,7 @@ describe 'Wf' do
     Wf.new
       .then(ErrorService.new)
       .catch(->(error){ dummy[:error] = error })
-    expect(dummy[:error]).to include(:ErrorService)
+    expect(dummy[:error]).to eq('ErrorService')
   end
 
   it 'works' do
@@ -54,7 +54,7 @@ describe 'Wf' do
       .tap(->(s){ @sery = s })
       .then(->{ dummy[:yo] = true })
       .then(Service.new(dummy))
-      .then(->{ @sery.reject('inside', 'error') })
+      .then(->{ @sery.reject('inside') })
       .then(Service2.new)
       .then(Service3.new)
       .then(->{ dummy[:bash] = true })
@@ -67,7 +67,7 @@ describe 'Wf' do
     expect(dummy[:service2]).to_not be_true
     expect(dummy[:service3]).to_not be_true
     expect(dummy[:bash]).to_not be_true
-    expect(dummy[:error]).to include(:inside)
+    expect(dummy[:error]).to eq 'inside'
   end
 
   it 'with subsery' do
@@ -86,7 +86,7 @@ describe 'Wf' do
       end
 
     expect(dummy[:sub2]).to_not be_true
-    expect(dummy[:error]).to include :sub1
+    expect(dummy[:error]).to eq 'sub1'
   end
 
   it 'with explicit nil errors' do
@@ -95,17 +95,7 @@ describe 'Wf' do
       .catch do |error|
         dummy[:error] = error
       end
-    expect(dummy[:error]).to include :foo
+    expect(dummy[:error]).to eq 'foo is missing'
   end
 
-  it 'with explicit nil errors' do
-    Wf.new
-      .then(SubWfWithNilErrorsWithKey.new)
-      .then(->{ dummy[:foo] = true })
-      .catch do |error|
-        dummy[:error] = error
-      end
-    expect(dummy[:error]).to include :bar
-    expect(dummy[:foo]).to_not be_true
-  end
 end

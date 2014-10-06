@@ -30,5 +30,9 @@ module Waterfall
     def first_arg_as_method_name?
       args[0].is_a?(Symbol) || args[0].is_a?(String)
     end
+
+    def is_waterfall?
+      handler.respond_to?(:is_waterfall?) && handler.is_waterfall?
+    end
   end
 end

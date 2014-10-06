@@ -11,7 +11,7 @@ end
 class ErrorService
   include Waterfall
   def call
-    reject('ErrorService', 'error')
+    reject('ErrorService')
     nil
   end
 end
@@ -66,7 +66,7 @@ class SubWfErr
   end
 
   def sub1
-    reject 'sub1', 'error'
+    reject 'sub1'
   end
 
   def sub2
@@ -78,26 +78,10 @@ class SubWfWithNilErrors
   include Waterfall
   def call
     self
-      .then(:foo, 'foo is missing')
+      .when_falsy(:foo, 'foo is missing')
   end
 
   def foo
     false
-  end
-end
-
-class SubWfWithNilErrorsWithKey
-  include Waterfall
-  def call
-    self
-      .then(:foo, 'foo is missing', 'bar')
-  end
-
-  def foo
-    internal_foo
-  end
-
-  def internal_foo
-    nil
   end
 end
