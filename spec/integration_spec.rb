@@ -51,10 +51,10 @@ describe 'Wf' do
 
   it 'works' do
     Wf.new
-      .tap(->(s){ @sery = s })
+      .tap(->(s){ @wf = s })
       .then(->{ dummy[:yo] = true })
       .then(Service.new(dummy))
-      .then(->{ @sery.reject('inside') })
+      .then(->{ @wf.reject('inside') })
       .then(Service2.new)
       .then(Service3.new)
       .then(->{ dummy[:bash] = true })
@@ -70,7 +70,7 @@ describe 'Wf' do
     expect(dummy[:error]).to eq 'inside'
   end
 
-  it 'with subsery' do
+  it 'with sub wf' do
     Wf.new
       .then(SubWf.new(dummy))
 
@@ -78,7 +78,7 @@ describe 'Wf' do
     expect(dummy[:sub2]).to be_true
   end
 
-  it 'with subsery and error' do
+  it 'with sub wf and error' do
     Wf.new
       .then(SubWfErr.new(dummy))
       .catch do |error|
