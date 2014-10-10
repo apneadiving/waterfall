@@ -2,7 +2,7 @@ waterfall
 =========
 
 A way to:
-- chain ruby services, blocks or procs, like promises (or monads)
+- chain ruby services, blocks or procs, like promises
 - halt the chain directly when an error happens (not talking about exceptions, they are not meant to be used for flow control right?)
 - catch errors in a block
 
