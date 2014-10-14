@@ -30,6 +30,7 @@ module Waterfall
 
   def catch(*args, &block)
     ::Waterfall::Catch.new(self, args, &block).call
+    self
   end
 
   def tap(proc = nil, &block)
