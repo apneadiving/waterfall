@@ -1,40 +1,53 @@
 require 'waterfall/version'
 require 'waterfall/predicates/base'
-require 'waterfall/predicates/then'
 require 'waterfall/predicates/catch'
 require 'waterfall/predicates/when_falsy'
+require 'waterfall/predicates/chain'
+require 'waterfall/predicates/chain_wf'
+require 'waterfall/predicates/merge_wf'
 
 module Waterfall
 
-  attr_reader :waterfall_result, :rejection_reason
+  attr_reader :rejection_reason, :wf_result
 
-  def then(*args, &block)
-    return self if stop_waterfall?
-
-    @waterfall_result = ::Waterfall::Then
-                          .new(self, args, &block)
-                          .call(waterfall_result)
-
-    self
+  def when_falsy(error_value, &block)
+    _wf_run do
+      ::Waterfall::WhenFalsy
+        .new(self, error_value, &block)
+        .call
+    end
   end
 
-  def when_falsy(*args, &block)
-    return self if stop_waterfall?
-
-    @waterfall_result = ::Waterfall::WhenFalsy
-                          .new(self, args, &block)
-                          .call(waterfall_result)
-
-    self
+  # chain(:var_name, block)
+  def chain(var_name = nil, &block)
+    _wf_run do
+      ::Waterfall::Chain
+        .new(self, var_name, &block)
+        .call
+    end
   end
 
-  def catch(*args, &block)
-    ::Waterfall::Catch.new(self, args, &block).call
-    self
+  # chain_wf(:mapping_hash, block)
+  def chain_wf(mapping_hash = {}, &block)
+    _wf_run do
+      ::Waterfall::ChainWf
+        .new(self, mapping_hash, &block)
+        .call
+    end
   end
 
-  def tap(proc = nil, &block)
-    (proc || block).call self
+  # merge_wf(block)
+  def merge_wf(&block)
+    _wf_run do
+      ::Waterfall::MergeWf
+        .new(self, &block)
+        .call
+    end
+  end
+
+  def catch(&block)
+    ::Waterfall::Catch.new(self, &block).call
+    self
   end
 
   def reject(obj)
@@ -47,6 +60,18 @@ module Waterfall
 
   def is_waterfall?
     true
+  end
+
+  def update_wf_result(key, value)
+    @wf_result[key] = value
+  end
+
+  def _wf_run(&block)
+    unless stop_waterfall?
+      @wf_result ||= {}
+      block.call
+    end
+    self
   end
 end
 

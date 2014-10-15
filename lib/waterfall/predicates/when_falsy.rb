@@ -1,23 +1,13 @@
 module Waterfall
   class WhenFalsy < Base
-    attr_reader :output
-    # .when_falsy(method_name, error_obj)
-    def call(previous_output)
-      @output = trigger_handler(previous_output)
-      post_process
-      output
+
+    def initialize(root, error_value, &block)
+      @root, @error_value, @block = root, error_value, block
     end
 
-    def post_process
-      if is_waterfall? && handler.stop_waterfall?
-        root.reject handler.rejection_reason
-      elsif !output
-        root.reject build_error
-      end
-    end
-
-    def build_error
-      args[1] || 'invalid'
+    def call
+      output = @block.call(@root.wf_result)
+      @root.reject @error_value if !output
     end
   end
 end
