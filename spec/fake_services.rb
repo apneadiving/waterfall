@@ -2,7 +2,7 @@ class SubWfWithNilErrors
   include Waterfall
   def call
     self
-      .when_falsy('foo is missing') { foo }
+      .when_falsy { foo }.then { 'foo is missing' }
   end
 
   def foo

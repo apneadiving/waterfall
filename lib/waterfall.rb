@@ -10,12 +10,12 @@ module Waterfall
 
   attr_reader :rejection_reason, :wf_result
 
-  def when_falsy(error_value, &block)
+  def when_falsy(&block)
+    handler = ::Waterfall::WhenFalsy.new(self, &block)
     _wf_run do
-      ::Waterfall::WhenFalsy
-        .new(self, error_value, &block)
-        .call
+      handler.call
     end
+    handler
   end
 
   # chain(:var_name, block)
