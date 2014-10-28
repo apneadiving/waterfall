@@ -9,8 +9,8 @@ module Waterfall
       @output = @block.call(@root.wf_result)
     end
 
-    def then(&block)
-      unless @output
+    def reject(&block)
+      if !@root.stop_waterfall? && !@output
         @root.reject block.call(@root.wf_result)
       end
       @root
