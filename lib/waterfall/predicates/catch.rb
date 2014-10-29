@@ -7,7 +7,7 @@ module Waterfall
 
     def call
       if @root.stop_waterfall?
-        @block.call @root.rejection_reason
+        @block.call @root.rejection_reason, @root
       else
         @root.wf_result
       end

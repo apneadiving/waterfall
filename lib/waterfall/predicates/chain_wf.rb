@@ -6,7 +6,7 @@ module Waterfall
     end
 
     def call
-      child_waterfall = @block.call
+      child_waterfall = call_block
 
       unless waterfall?(child_waterfall)
         raise "You're wf chaining a #{ child_waterfall.class } instead of a waterfall"

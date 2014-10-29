@@ -6,7 +6,7 @@ module Waterfall
     end
 
     def call
-      @output = @block.call(@root.wf_result)
+      @output = call_block
     end
 
     def reject(&block)
