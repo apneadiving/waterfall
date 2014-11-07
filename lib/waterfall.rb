@@ -1,6 +1,6 @@
 require 'waterfall/version'
 require 'waterfall/predicates/base'
-require 'waterfall/predicates/catch'
+require 'waterfall/predicates/on_error'
 require 'waterfall/predicates/when_falsy'
 require 'waterfall/predicates/chain'
 require 'waterfall/predicates/chain_wf'
@@ -45,8 +45,8 @@ module Waterfall
     end
   end
 
-  def catch(&block)
-    ::Waterfall::Catch.new(self, &block).call
+  def on_error(&block)
+    ::Waterfall::OnError.new(self, &block).call
     self
   end
 

@@ -5,7 +5,7 @@ describe 'Wf' do
   it 'with explicit nil errors' do
     Wf.new
       .chain_wf { SubWfWithNilErrors.new }
-      .catch do |error|
+      .on_error do |error|
         dummy[:error] = error
       end
     expect(dummy[:error]).to eq 'foo is missing'
@@ -30,8 +30,8 @@ describe 'Wf' do
     it "interruption" do
       Wf.new
         .merge_wf { InterruptedChain.new }
-        .chain {|result| dummy[:result] = result }
-        .catch {|errors| dummy[:errors] = errors }
+        .chain    {|result| dummy[:result] = result }
+        .on_error {|errors| dummy[:errors] = errors }
 
       expect(dummy[:result]).to be_nil
       expect(dummy[:errors]).to eq 'no!'

@@ -84,4 +84,3 @@ class ChainExampleInterruptor
   end
 
 end
-

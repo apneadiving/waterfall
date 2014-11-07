@@ -1,5 +1,5 @@
 module Waterfall
-  class Catch < Base
+  class OnError < Base
 
     def initialize(root, &block)
       @root, @block = root, block
