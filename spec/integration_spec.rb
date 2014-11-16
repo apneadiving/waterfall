@@ -2,10 +2,32 @@ require 'spec_helper'
 
 describe 'Wf' do
   let(:dummy) { { } }
+
+  it "gives access to wf outflow" do
+    wf = Wf.new
+      .chain(:foo) { 'foo' }
+      .chain    {|outflow| outflow[:bar] = 'bar' }
+      .on_dammed {|error_pool| dummy[:errors] = error_pool }
+    expect(wf.outflow[:foo]).to eq 'foo'
+    expect(wf.outflow[:bar]).to eq 'bar'
+    expect(dummy[:errors]).to be_nil
+  end
+
+  it "gives access to wf internals" do
+    wf = Wf.new
+      .chain(:foo) { 'foo' }
+      .chain    {|outflow, wf| wf.dam('errrrr') }
+      .on_dammed {|error_pool| dummy[:errors] = error_pool }
+
+    expect(wf.outflow[:foo]).to eq 'foo'
+    expect(wf.dammed?).to be true
+    expect(dummy[:errors]).to_not be_nil
+  end
+
   it 'with explicit nil errors' do
     Wf.new
       .chain_wf { SubWfWithNilErrors.new }
-      .on_error do |error|
+      .on_dammed do |error|
         dummy[:error] = error
       end
     expect(dummy[:error]).to eq 'foo is missing'
@@ -31,10 +53,18 @@ describe 'Wf' do
       Wf.new
         .merge_wf { InterruptedChain.new }
         .chain    {|result| dummy[:result] = result }
-        .on_error {|errors| dummy[:errors] = errors }
+        .on_dammed {|errors| dummy[:errors] = errors }
 
-      expect(dummy[:result]).to be_nil
+      expect(dummy).to_not have_key :result
       expect(dummy[:errors]).to eq 'no!'
+    end
+
+    it "a raw wf should not be called again" do
+      wf = InterruptedChain.new
+      expect(wf).to receive(:call).once.and_call_original
+
+      Wf.new
+        .merge_wf { wf.call }
     end
   end
 

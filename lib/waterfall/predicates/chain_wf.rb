@@ -6,19 +6,9 @@ module Waterfall
     end
 
     def call
-      child_waterfall = call_block
-
-      unless waterfall?(child_waterfall)
-        raise "You're wf chaining a #{ child_waterfall.class } instead of a waterfall"
-      end
-
-      child_waterfall.call
-
-      if child_waterfall.stop_waterfall?
-        @root.reject child_waterfall.rejection_reason
-      else
+      chained_waterfall do |child_waterfall|
         @mapping.each do |k, v|
-          @root.update_wf_result(k, child_waterfall.wf_result[v])
+          @root.update_outflow(k, child_waterfall.outflow[v])
         end
       end
     end

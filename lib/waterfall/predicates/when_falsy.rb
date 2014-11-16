@@ -9,11 +9,10 @@ module Waterfall
       @output = call_block
     end
 
-    def reject(&block)
-      if !@root.stop_waterfall? && !@output
-        @root.reject block.call(@root.wf_result)
+    def dam(&block)
+      if !@root.dammed? && !@output
+        @root.dam block.call(@root.outflow)
       end
-      @root
     end
   end
 end

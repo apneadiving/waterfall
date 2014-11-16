@@ -7,7 +7,7 @@ module Waterfall
 
     def call
       output = call_block
-      @root.update_wf_result(@var_name, output) if @var_name
+      @root.update_outflow(@var_name, output) if @var_name
     end
 
   end
