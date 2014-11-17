@@ -68,4 +68,26 @@ describe 'Wf' do
     end
   end
 
+  context "when falsy" do
+    def action(bool)
+      Wf.new
+        .when_falsy { bool }
+          .dam  { 'err' }
+        .chain  { @foo = 1 }
+        .on_dam { |error_pool| @error = error_pool }
+    end
+
+    it "when actually falsy" do
+      action false
+      expect(@error).to eq 'err'
+      expect(@foo).to_not eq 1
+    end
+
+    it "when actually truthy" do
+      action true
+      expect(@error).to_not eq 'err'
+      expect(@foo).to eq 1
+    end
+  end
+
 end

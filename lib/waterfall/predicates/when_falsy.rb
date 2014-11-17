@@ -13,6 +13,7 @@ module Waterfall
       if !@root.dammed? && !@output
         @root.dam block.call(@root.outflow)
       end
+      @root
     end
   end
 end
