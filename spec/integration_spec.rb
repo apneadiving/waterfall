@@ -6,8 +6,8 @@ describe 'Wf' do
   it "gives access to wf outflow" do
     wf = Wf.new
       .chain(:foo) { 'foo' }
-      .chain    {|outflow| outflow[:bar] = 'bar' }
-      .on_dammed {|error_pool| dummy[:errors] = error_pool }
+      .chain  {|outflow| outflow[:bar] = 'bar' }
+      .on_dam {|error_pool| dummy[:errors] = error_pool }
     expect(wf.outflow[:foo]).to eq 'foo'
     expect(wf.outflow[:bar]).to eq 'bar'
     expect(dummy[:errors]).to be_nil
@@ -16,8 +16,8 @@ describe 'Wf' do
   it "gives access to wf internals" do
     wf = Wf.new
       .chain(:foo) { 'foo' }
-      .chain    {|outflow, wf| wf.dam('errrrr') }
-      .on_dammed {|error_pool| dummy[:errors] = error_pool }
+      .chain  {|outflow, wf| wf.dam('errrrr') }
+      .on_dam {|error_pool| dummy[:errors] = error_pool }
 
     expect(wf.outflow[:foo]).to eq 'foo'
     expect(wf.dammed?).to be true
@@ -27,7 +27,7 @@ describe 'Wf' do
   it 'with explicit nil errors' do
     Wf.new
       .chain_wf { SubWfWithNilErrors.new }
-      .on_dammed do |error|
+      .on_dam do |error|
         dummy[:error] = error
       end
     expect(dummy[:error]).to eq 'foo is missing'
@@ -52,8 +52,8 @@ describe 'Wf' do
     it "interruption" do
       Wf.new
         .merge_wf { InterruptedChain.new }
-        .chain    {|result| dummy[:result] = result }
-        .on_dammed {|errors| dummy[:errors] = errors }
+        .chain  {|result| dummy[:result] = result }
+        .on_dam {|errors| dummy[:errors] = errors }
 
       expect(dummy).to_not have_key :result
       expect(dummy[:errors]).to eq 'no!'

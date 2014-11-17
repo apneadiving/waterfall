@@ -1,5 +1,5 @@
 module Waterfall
-  class OnDammed < Base
+  class OnDam < Base
 
     def initialize(root, &block)
       @root, @block = root, block

@@ -1,6 +1,6 @@
 require 'waterfall/version'
 require 'waterfall/predicates/base'
-require 'waterfall/predicates/on_dammed'
+require 'waterfall/predicates/on_dam'
 require 'waterfall/predicates/when_falsy'
 require 'waterfall/predicates/chain'
 require 'waterfall/predicates/chain_wf'
@@ -40,8 +40,8 @@ module Waterfall
     end
   end
 
-  def on_dammed(&block)
-    ::Waterfall::OnDammed.new(self, &block).call
+  def on_dam(&block)
+    ::Waterfall::OnDam.new(self, &block).call
     self
   end
 
