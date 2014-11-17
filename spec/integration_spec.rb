@@ -22,7 +22,7 @@ describe 'Wf' do
     context "wf internals" do
       it "dam from within" do
         wf
-          .chain  {|outflow, wf| wf.dam('errrrr') }
+          .chain  {|outflow, waterfall| waterfall.dam('errrrr') }
           .on_dam {|error_pool| @errors = error_pool }
 
         expect(wf.dammed?).to be true
@@ -31,7 +31,7 @@ describe 'Wf' do
 
       it "outflow from within" do
         wf
-          .chain {|outflow, wf| wf.outflow[:foo] = 1 }
+          .chain {|outflow, waterfall| waterfall.outflow[:foo] = 1 }
 
         expect(wf.outflow[:foo]).to eq 1
       end
@@ -146,7 +146,7 @@ describe 'Wf' do
 
       def call
         self
-          .chain {|error_pool, _wf| _wf.dam(self.class.error) }
+          .chain {|error_pool, waterfall| waterfall.dam(self.class.error) }
       end
 
       def self.error
