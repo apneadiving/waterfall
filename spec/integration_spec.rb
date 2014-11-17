@@ -8,7 +8,9 @@ describe 'Wf' do
     it "yields wf outflow" do
       wf
         .chain  {|outflow| outflow[:bar] = 'bar' }
+        .chain  {|outflow| @bar = outflow[:bar] }
       expect(wf.outflow[:bar]).to eq 'bar'
+      expect(@bar).to eq 'bar'
     end
 
     it "assigns outflow's key the value of the block" do
