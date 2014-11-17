@@ -157,8 +157,10 @@ describe 'Wf' do
     it "error propagates" do
       wf
         .chain_wf { FailingChain.new }
+        .chain    { @foo = 1 }
         .on_dam   { |error_pool| @error = error_pool }
 
+      expect(@foo).to_not eq 1
       expect(@error).to eq FailingChain.error
     end
   end
