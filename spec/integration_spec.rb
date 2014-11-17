@@ -1,76 +1,124 @@
 require 'spec_helper'
 
 describe 'Wf' do
-  let(:dummy) { { } }
-
-  it "gives access to wf outflow" do
-    wf = Wf.new
-      .chain(:foo) { 'foo' }
-      .chain  {|outflow| outflow[:bar] = 'bar' }
-      .on_dam {|error_pool| dummy[:errors] = error_pool }
-    expect(wf.outflow[:foo]).to eq 'foo'
-    expect(wf.outflow[:bar]).to eq 'bar'
-    expect(dummy[:errors]).to be_nil
-  end
-
-  it "gives access to wf internals" do
-    wf = Wf.new
-      .chain(:foo) { 'foo' }
-      .chain  {|outflow, wf| wf.dam('errrrr') }
-      .on_dam {|error_pool| dummy[:errors] = error_pool }
-
-    expect(wf.outflow[:foo]).to eq 'foo'
-    expect(wf.dammed?).to be true
-    expect(dummy[:errors]).to_not be_nil
-  end
-
-  it 'with explicit nil errors' do
-    Wf.new
-      .chain_wf { SubWfWithNilErrors.new }
-      .on_dam do |error|
-        dummy[:error] = error
-      end
-    expect(dummy[:error]).to eq 'foo is missing'
-  end
+  let(:wf) { Wf.new }
 
   context "chain" do
-    it "returns expected result" do
-      Wf.new
-        .merge_wf { ChainExample.new }
-        .chain {|result| dummy[:result] = result }
 
-      expected = {
-        result1: 1,
-        result2: 'hi',
-        result3: 3,
-        result4: 4
-      }
-
-      expect(dummy[:result]).to eq expected
+    it "yields wf outflow" do
+      wf
+        .chain  {|outflow| outflow[:bar] = 'bar' }
+      expect(wf.outflow[:bar]).to eq 'bar'
     end
 
-    it "interruption" do
-      Wf.new
-        .merge_wf { InterruptedChain.new }
-        .chain  {|result| dummy[:result] = result }
-        .on_dam {|errors| dummy[:errors] = errors }
-
-      expect(dummy).to_not have_key :result
-      expect(dummy[:errors]).to eq 'no!'
+    it "assigns outflow's key the value of the block" do
+      wf
+        .chain(:bar) { 'bar' }
+      expect(wf.outflow[:bar]).to eq 'bar'
     end
 
-    it "a raw wf should not be called again" do
-      wf = InterruptedChain.new
-      expect(wf).to receive(:call).once.and_call_original
+    context "wf internals" do
+      it "dam from within" do
+        wf
+          .chain  {|outflow, wf| wf.dam('errrrr') }
+          .on_dam {|error_pool| @errors = error_pool }
 
-      Wf.new
-        .merge_wf { wf.call }
+        expect(wf.dammed?).to be true
+        expect(@errors).to eq 'errrrr'
+      end
+
+      it "outflow from within" do
+        wf
+          .chain {|outflow, wf| wf.outflow[:foo] = 1 }
+
+        expect(wf.outflow[:foo]).to eq 1
+      end
+    end
+
+    describe "undam" do
+      it "lets you make the waterfall flow" do
+        wf
+          .when_falsy { false }
+            .dam  { 'err' }
+          .on_dam { |error_pool, waterfall| waterfall.undam }
+          .chain  { @foo = 1 }
+          .on_dam { @error = 'errr' }
+
+          expect(@foo).to eq 1
+          expect(@error).to_not eq 'errr'
+      end
+    end
+
+    context "chaining waterfalls" do
+
+      shared_examples "a waterfall chain" do
+        describe 'merge_wf' do
+          it "merges the two outflows" do
+            wf
+              .merge_wf { waterfall }
+
+            expect(wf.outflow[:foo]).to eq waterfall.outflow[:foo]
+            expect(wf.outflow[:bar]).to eq waterfall.outflow[:bar]
+          end
+        end
+
+        describe 'chain_wf' do
+          it "takes expected vars only and rename them" do
+            wf
+              .chain_wf(baz: :foo) { waterfall }
+
+            expect(wf.outflow).to_not have_key :foo
+            expect(wf.outflow).to_not have_key :bar
+            expect(wf.outflow[:baz]).to eq waterfall.outflow[:foo]
+          end
+        end
+      end
+
+      context "from an instance of a custom waterfall class" do
+        class FakeService
+          include Waterfall
+
+          def call
+            self
+              .chain(:foo) { 1 }
+              .chain(:bar) { 2 }
+          end
+        end
+
+        let(:waterfall) { FakeService.new }
+
+        it_behaves_like "a waterfall chain"
+
+        context "only calls waterfall service if it was never called before" do
+          it "when passed as an instance responding to call" do
+            expect(waterfall).to receive(:call).once.and_call_original
+            wf
+              .chain_wf { waterfall }
+          end
+
+          it "already called" do
+            expect(waterfall).to receive(:call).once.and_call_original
+            wf
+              .chain_wf { waterfall.call }
+          end
+        end
+      end
+
+      context "from a mere wf" do
+        let(:waterfall) do
+          Wf.new
+            .chain(:foo) { 1 }
+            .chain(:bar) { 2 }
+        end
+
+        it_behaves_like "a waterfall chain"
+      end
     end
   end
 
   context "when falsy" do
     def action(bool)
-      Wf.new
+      wf
         .when_falsy { bool }
           .dam  { 'err' }
         .chain  { @foo = 1 }
@@ -90,4 +138,26 @@ describe 'Wf' do
     end
   end
 
+  context "error propagation" do
+    class FailingChain
+      include Waterfall
+
+      def call
+        self
+          .chain {|error_pool, _wf| _wf.dam(self.class.error) }
+      end
+
+      def self.error
+        'err'
+      end
+    end
+
+    it "error propagates" do
+      wf
+        .chain_wf { FailingChain.new }
+        .on_dam   { |error_pool| @error = error_pool }
+
+      expect(@error).to eq FailingChain.error
+    end
+  end
 end

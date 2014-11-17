@@ -53,6 +53,10 @@ module Waterfall
     !error_pool.nil?
   end
 
+  def undam
+    @error_pool = nil
+  end
+
   def is_waterfall?
     true
   end

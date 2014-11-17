@@ -6,7 +6,6 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require File.expand_path('../../lib/waterfall', __FILE__)
-require File.expand_path('../fake_services', __FILE__)
 require 'pry'
 
 RSpec.configure do |config|
