@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'Wf' do
   let(:wf) { Wf.new }
 
-  context "chain" do
+  describe "chain" do
 
     it "yields wf outflow" do
       wf
@@ -37,21 +37,7 @@ describe 'Wf' do
       end
     end
 
-    describe "undam" do
-      it "lets you make the waterfall flow" do
-        wf
-          .when_falsy { false }
-            .dam  { 'err' }
-          .on_dam { |error_pool, waterfall| waterfall.undam }
-          .chain  { @foo = 1 }
-          .on_dam { @error = 'errr' }
-
-          expect(@foo).to eq 1
-          expect(@error).to_not eq 'errr'
-      end
-    end
-
-    context "chaining waterfalls" do
+    describe "chaining waterfalls" do
 
       shared_examples "a waterfall chain" do
         describe 'merge_wf' do
@@ -118,7 +104,7 @@ describe 'Wf' do
     end
   end
 
-  context "when falsy" do
+  describe "when falsy" do
     def action(bool)
       wf
         .when_falsy { bool }
@@ -140,7 +126,7 @@ describe 'Wf' do
     end
   end
 
-  context "error propagation" do
+  describe "error propagation" do
     class FailingChain
       include Waterfall
 
@@ -163,5 +149,74 @@ describe 'Wf' do
       expect(@foo).to_not eq 1
       expect(@error).to eq FailingChain.error
     end
+  end
+
+
+  describe "rollback" do
+    class FakeServiceBase
+      include Waterfall
+      def call
+        self.chain { }
+      end
+
+      def rollback
+      end
+    end
+
+    class MasterFakeService < FakeServiceBase
+    end
+
+    class FakeService1 < FakeServiceBase
+      def call
+        self.chain_wf { SubFakeService1.new }
+      end
+    end
+
+    class FakeService2 < FakeServiceBase
+    end
+
+    class FakeService3 < FakeServiceBase
+      def call
+        self.chain {|outflow, wf| wf.dam 'error' }
+      end
+    end
+
+    class FakeService4 < FakeServiceBase
+    end
+
+    class SubFakeService1 < FakeServiceBase
+    end
+
+    it "doesnt call rollback if no on_dam" do
+      expect_any_instance_of(MasterFakeService).to_not receive(:rollback)
+      expect_any_instance_of(FakeService1).to_not receive(:rollback)
+      expect_any_instance_of(SubFakeService1).to_not receive(:rollback)
+      expect_any_instance_of(FakeService2).to_not receive(:rollback)
+      expect_any_instance_of(FakeService3).to_not receive(:rollback)
+      expect_any_instance_of(FakeService4).to_not receive(:rollback)
+
+      MasterFakeService.new
+        .chain_wf { FakeService1.new }
+        .chain_wf { FakeService2.new }
+        .chain_wf { FakeService3.new }
+        .chain_wf { FakeService4.new }
+    end
+
+    it "calls rollback on executed waterfalls" do
+      expect_any_instance_of(MasterFakeService).to_not receive(:rollback)
+      expect_any_instance_of(FakeService1).to receive(:rollback)
+      expect_any_instance_of(SubFakeService1).to receive(:rollback)
+      expect_any_instance_of(FakeService2).to receive(:rollback)
+      expect_any_instance_of(FakeService3).to_not receive(:rollback)
+      expect_any_instance_of(FakeService4).to_not receive(:rollback)
+
+      MasterFakeService.new
+        .chain_wf { FakeService1.new }
+        .chain_wf { FakeService2.new }
+        .chain_wf { FakeService3.new }
+        .chain_wf { FakeService4.new }
+        .on_dam   { }
+    end
+
   end
 end

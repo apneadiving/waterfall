@@ -7,6 +7,7 @@ module Waterfall
 
     def call
       if @root.dammed?
+        @root._wf_rollback(rollback_self: false)
         @block.call @root.error_pool, @root
       end
     end

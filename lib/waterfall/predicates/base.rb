@@ -22,6 +22,7 @@ module Waterfall
         @root.dam child_waterfall.error_pool
       else
         block.call(child_waterfall)
+        @root.add_executed_waterfall(child_waterfall)
       end
     end
   end

@@ -8,7 +8,7 @@ require 'waterfall/predicates/merge_wf'
 
 module Waterfall
 
-  attr_reader :error_pool, :outflow, :flowing
+  attr_reader :error_pool, :outflow, :flowing, :executed_waterfalls, :_wf_rolled_back
 
   def when_falsy(&block)
     handler = ::Waterfall::WhenFalsy.new(self, &block)
@@ -41,7 +41,9 @@ module Waterfall
   end
 
   def on_dam(&block)
-    ::Waterfall::OnDam.new(self, &block).call
+    ::Waterfall::OnDam
+      .new(self, &block)
+      .call
     self
   end
 
@@ -51,10 +53,6 @@ module Waterfall
 
   def dammed?
     !error_pool.nil?
-  end
-
-  def undam
-    @error_pool = nil
   end
 
   def is_waterfall?
@@ -69,11 +67,21 @@ module Waterfall
     @outflow[key] = value
   end
 
+  def add_executed_waterfall(wf)
+    @executed_waterfalls.push wf
+  end
+
   def _wf_run(&block)
     @flowing = true
+    @executed_waterfalls ||= []
     @outflow ||= {}
     block.call unless dammed?
     self
+  end
+
+  def _wf_rollback(arg = {rollback_self: true })
+    rollback if respond_to?(:rollback) && arg[:rollback_self]
+    executed_waterfalls.each(&:_wf_rollback)
   end
 end
 
