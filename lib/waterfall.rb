@@ -2,6 +2,7 @@ require 'waterfall/version'
 require 'waterfall/predicates/base'
 require 'waterfall/predicates/on_dam'
 require 'waterfall/predicates/when_falsy'
+require 'waterfall/predicates/when_truthy'
 require 'waterfall/predicates/chain'
 require 'waterfall/predicates/chain_wf'
 require 'waterfall/predicates/merge_wf'
@@ -11,39 +12,45 @@ module Waterfall
   attr_reader :error_pool, :outflow, :flowing, :executed_waterfalls, :_wf_rolled_back
 
   def when_falsy(&block)
-    handler = ::Waterfall::WhenFalsy.new(self, &block)
-    _wf_run { handler.call }
+    handler = ::Waterfall::WhenFalsy.new(self)
+    _wf_run { handler.call(&block) }
+    handler
+  end
+
+  def when_truthy(&block)
+    handler = ::Waterfall::WhenTruthy.new(self)
+    _wf_run { handler.call(&block) }
     handler
   end
 
   def chain(var_name = nil, &block)
     _wf_run do
       ::Waterfall::Chain
-        .new(self, var_name, &block)
-        .call
+        .new(self, var_name)
+        .call(&block)
     end
   end
 
   def chain_wf(mapping_hash = {}, &block)
     _wf_run do
       ::Waterfall::ChainWf
-        .new(self, mapping_hash, &block)
-        .call
+        .new(self, mapping_hash)
+        .call(&block)
     end
   end
 
   def merge_wf(&block)
     _wf_run do
       ::Waterfall::MergeWf
-        .new(self, &block)
-        .call
+        .new(self)
+        .call(&block)
     end
   end
 
   def on_dam(&block)
     ::Waterfall::OnDam
-      .new(self, &block)
-      .call
+      .new(self)
+      .call(&block)
     self
   end
 
@@ -60,7 +67,7 @@ module Waterfall
   end
 
   def flowing?
-    @flowing
+    !! @flowing
   end
 
   def update_outflow(key, value)
@@ -75,7 +82,7 @@ module Waterfall
     @flowing = true
     @executed_waterfalls ||= []
     @outflow ||= {}
-    block.call unless dammed?
+    yield unless dammed?
     self
   end
 

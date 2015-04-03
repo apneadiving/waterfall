@@ -1,12 +1,13 @@
 module Waterfall
   class ChainWf < Base
 
-    def initialize(root, mapping, &block)
-      @root, @mapping, @block = root, mapping, block
+    def initialize(root, mapping)
+      @root, @mapping = root, mapping
     end
 
-    def call
-      chained_waterfall do |child_waterfall|
+    def call(&block)
+      child_waterfall = yield(*yield_args)
+      chained_waterfall(child_waterfall) do
         @mapping.each do |k, v|
           @root.update_outflow(k, child_waterfall.outflow[v])
         end

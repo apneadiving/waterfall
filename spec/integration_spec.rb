@@ -137,6 +137,44 @@ describe 'Wf' do
 
       it "when actually falsy" do
         expect(my_proc).to_not receive(:call)
+        action false
+      end
+    end
+  end
+
+  describe "when truthy" do
+    let(:my_proc) { ->(val){ val } }
+
+    def action(bool)
+      wf
+        .chain { wf.dam('dammed') if dam? }
+        .when_truthy { my_proc.call(bool) }
+          .dam  { 'err' }
+        .chain  { @foo = 1 }
+        .on_dam { |error_pool| @error = error_pool }
+    end
+
+    context "main context not dammed" do
+      let(:dam?) { false }
+
+      it "when actually falsy" do
+        action false
+        expect(@error).to_not eq 'err'
+        expect(@foo).to eq 1
+      end
+
+      it "when actually truthy" do
+        action true
+        expect(@error).to eq 'err'
+        expect(@foo).to_not eq 1
+      end
+    end
+
+    context "main context dammed" do
+      let(:dam?) { true }
+
+      it "when actually truthy" do
+        expect(my_proc).to_not receive(:call)
         action true
       end
     end

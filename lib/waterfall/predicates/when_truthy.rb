@@ -1,5 +1,5 @@
 module Waterfall
-  class WhenFalsy < Base
+  class WhenTruthy < Base
 
     def initialize(root)
       @root = root
@@ -10,7 +10,7 @@ module Waterfall
     end
 
     def dam(&block)
-      if !@root.dammed? && !@output
+      if !@root.dammed? && @output
         @root.dam yield(*yield_args)
       end
       @root
