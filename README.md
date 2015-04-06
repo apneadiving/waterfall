@@ -6,49 +6,42 @@ Be able to chain ruby commands, and treat them like a flow.
 
 #### Example
 
-Lets check a rather complex example, with many different outcomes, so the code not that obvious to follow:
+Lets check with the following example, with many different outcomes, which code is not that obvious to follow:
 
-    def accept_group_terms
-      if current_entity.user? && notification.group_terms?
-        if params[:terms_of_service][:checked]
-          user_group = notification.entity.user_groups.with_user(current_entity).first
-          if user_group
-            user_group.terms_accepted_at = Time.now
-            user_group.save
-            notification.mark_as_read_by(current_entity).save!
-            render_notif
-          else
-            render_error 'You are not allowed to answer this form'
+    def submit_application
+      if current_user.confirmed?
+        if params[:terms_of_service]
+          application = current_user.build_application
+          if application.save
+            render json: { ok: true }
+          else 
+            render_errors application.errors.full_messages
           end
         else
-          render_error 'You must accept the terms'
+          render_errors 'You must accept the terms'
         end
       else
-        render_error 'You cannot answer this form'
+        render_errors 'You need to confirm your account first'
       end
     end
     
-    def render_error(error)
-      render json: { errors: [ error ] }, status: 422
+    def render_error(errors)
+      render json: { errors: Array(errors) }, status: 422
     end
 
 Waterfall lets you write it this way:
 
     def accept_group_terms
       Wf.new
-        .when_falsy { current_entity.user? && notification.group_terms? }
-          .dam { 'You cannot answer this form' }
-        .when_falsy { params[:terms_of_service][:checked] }
+        .when_falsy { current_user.confirmed? }
+          .dam { 'You need to confirm your account first' }
+        .when_falsy { params[:terms_of_service] }
           .dam { 'You must accept the terms' }
-        .when_falsy { @user_group = notification.entity.user_groups.with_user(current_entity).first }
-          .dam { 'You are not allowed to answer this form' }
-        .chain {
-          @user_group.terms_accepted_at = Time.now
-          @user_group.save
-          notification.mark_as_read_by(current_entity).save!
-          render_notif      
-        }
-        .on_dam { |err| render json: { errors: [err] }, status: 422 }
+        .chain { @application = current_user.build_application }
+        .when_falsy { @application.save }
+          .dam { @application.errors.full_messages }
+        .chain {  render json: { ok: true } }
+        .on_dam { |errors| render json: { errors: Array(errors) }, status: 422 }
     end
 
 Once the flow faces a `dam`, all following instructions are skipped, until an `on_dam` is found.
