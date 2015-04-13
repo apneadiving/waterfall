@@ -9,6 +9,8 @@ require 'waterfall/predicates/merge_wf'
 
 module Waterfall
 
+  class PromiseMissing < StandardError; end
+
   attr_reader :error_pool, :outflow, :flowing, :executed_waterfalls, :_wf_rolled_back
 
   def when_falsy(&block)
@@ -89,6 +91,39 @@ module Waterfall
   def _wf_rollback(arg = {rollback_self: true })
     rollback if respond_to?(:rollback) && arg[:rollback_self]
     executed_waterfalls.each(&:_wf_rollback)
+  end
+
+  def ensure_promises(&block)
+    yield
+    absent_keys = []
+    self.class._wf_promises.each do |promise_key|
+      absent_keys.push(promise_key) unless outflow && outflow.has_key?(promise_key)
+    end
+
+    raise PromiseMissing, "#{ absent_keys.join(', ') }are missing" unless absent_keys.empty?
+
+    self
+  end
+
+  def self.included(base)
+    base.extend ::Waterfall::ClassMethods
+  end
+
+  module ClassMethods
+    attr_accessor :_wf_promises
+
+    def _inherit_wf_promises(promises_list)
+      @_wf_promises = promises_list ? promises_list.dup : []
+    end
+
+    def promises(*args)
+      @_wf_promises ||= []
+      @_wf_promises.concat args
+    end
+
+    def inherited(subclass)
+      subclass._inherit_wf_promises(self._wf_promises) if self.respond_to?(:_wf_promises)
+    end
   end
 end
 

@@ -90,6 +90,7 @@ describe 'Wf' do
               .chain_wf { waterfall.call }
           end
         end
+        after(:all){ Object.send(:remove_const, :FakeService) }
       end
 
       context "from a mere wf" do
@@ -203,6 +204,7 @@ describe 'Wf' do
       expect(@foo).to_not eq 1
       expect(@error).to eq FailingChain.error
     end
+    after(:all){ Object.send(:remove_const, :FailingChain) }
   end
 
 
@@ -241,6 +243,16 @@ describe 'Wf' do
     class SubFakeService1 < FakeServiceBase
     end
 
+    after(:all) do
+      Object.send(:remove_const, :SubFakeService1)
+      Object.send(:remove_const, :FakeService4)
+      Object.send(:remove_const, :FakeService3)
+      Object.send(:remove_const, :FakeService2)
+      Object.send(:remove_const, :FakeService1)
+      Object.send(:remove_const, :MasterFakeService)
+      Object.send(:remove_const, :FakeServiceBase)
+    end
+
     it "doesnt call rollback if no on_dam" do
       expect_any_instance_of(MasterFakeService).to_not receive(:rollback)
       expect_any_instance_of(FakeService1).to_not receive(:rollback)
@@ -273,4 +285,6 @@ describe 'Wf' do
     end
 
   end
+
+
 end
