@@ -44,7 +44,7 @@ Waterfall lets you write it this way:
         .on_dam { |errors| render json: { errors: Array(errors) }, status: 422 }
     end
 
-Once the flow faces a `dam`, all following instructions are skipped, until an `on_dam` is found.
+Once the flow faces a `dam`, all following instructions are skipped, only the `on_dam` blocks are executed.
 
 Moreover, if you move this code to an object, you'll have the ability to chain it.
 See other examples:
