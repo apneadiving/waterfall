@@ -46,8 +46,9 @@ Waterfall lets you write it this way:
 
 Once the flow faces a `dam`, all following instructions are skipped, only the `on_dam` blocks are executed.
 
-Moreover, if you move this code to an object, you'll have the ability to chain it.
-See other examples:
+This is maybe just fancy, but the real power of waterfall is: you can chain waterfalls, and this is where it begins to be great.
+
+See examples:
 - https://gist.github.com/apneadiving/b1e9d30f08411e24eae6
 - https://gist.github.com/apneadiving/f1de3517a727e7596564
 
