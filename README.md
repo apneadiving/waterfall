@@ -54,40 +54,66 @@ See examples:
 
 #### Chaining Waterfalls
 
-CreateOrder, ChargeCard, SendThankYou
-    class ProcessOrder
+    class AcceptInvitation
       include Waterfall
       include ActiveModel::Validations
       
-      attr_reader :email, :password, :user
-      def initialize(email, password)
-        @email, @password = email, password
-      end
+      attr_reader :token, :referrer
       
-      def call
-        self 
-          .when_falsy { @user = User.authenticate(email, password) }
-            .dam do
-              errors.add(:authentication, 'failed')
-              errors
-            end
-          .chain(:authenticated_user) { user }
-      end
-    end
-    
-    class Logger
-      include Waterfall
-      attr_reader :current_user, :action, :payload
+      validates :referrer, presence: true
       
-      def initialize(current_user, action, payload)
-        @current_user, @action, @payload = current_user, action, payload
+      def initialize(referrer_id, token)
+        @referrer_id, @token = referrer_id, token
       end
       
       def call
         self
-          .chain
+          .chain { @referrer = User.find_by(id: @referrer_id) }
+          .when_falsy { valid? }
+            .dam { errors }
+          .chain_wf(invitee: :authenticated_user) do
+            AuthenticateFromInvitationToken.new(token)
+          end
+          .chain do |outflow|
+            referrer.complete_affiliation_for(outflow[:invitee])
+          end
       end
     end
+
+    class AuthenticateFromInvitationToken
+      include Waterfall
+      include ActiveModel::Validations
+      attr_reader :token, :user
+      
+      validates :user, presence: true
+      
+      def initialize(token)
+        @token = token
+      end
+      
+      def call
+        self 
+          .chain { @user = User.from_invitation_token(token) }
+          .when_falsy { valid? }
+            .dam { errors }
+          .chain(:authenticated_user) { user }
+      end
+    end
+    
+    # in controller
+    def accept_invitation
+      Wf.new
+        .chain_wf(invitee: :invitee) { AcceptInvitation.new(params[:referrer_id], params[:token]) }
+        .chain do |outflow|
+          @invitee = outflow[:invitee]
+          render :invitation_form
+        end
+        .on_dam do |errors|
+          errors.full_messages.each {|error| flash[:error] = error }
+          redirect_to root_path
+        end
+    end
+
 
 
 #### Rationale
