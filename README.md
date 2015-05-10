@@ -45,7 +45,6 @@ def accept_group_terms
     .on_dam { |errors| render json: { errors: Array(errors) }, status: 422 }
 end
 ```
-Once the flow faces a `dam`, all following instructions are skipped, only the `on_dam` blocks are executed.
 
 This is maybe just fancy, but the real power of waterfall is: you can chain waterfalls, and this is where it begins to be great.
 
@@ -111,6 +110,13 @@ def accept_invitation
     end
 end
 ```
+
+#### Handling failure
+
+When you chain statements and waterfalls, once the flow faces a `dam`, all following instructions are skipped, only the `on_dam` blocks are executed.
+
+Moreover, in the waterfalls executed before the one facing the dam, `rollback` is triggered.
+
 
 
 #### Rationale
