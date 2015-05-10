@@ -115,9 +115,8 @@ end
 
 When you chain statements and waterfalls, once the flow faces a `dam`, all following instructions are skipped, only the `on_dam` blocks are executed.
 
-Moreover, in the waterfalls executed before the one facing the dam, `rollback` is triggered.
-
-
+Moreover, in the waterfalls executed before the one facing the dam, `rollback` is triggered if defined.
+So you can define it to rollback changes made. I recommend you use nested transactions though.
 
 #### Rationale
 Coding is all about writing a flow of commands.
