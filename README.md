@@ -52,7 +52,32 @@ See examples:
 - https://gist.github.com/apneadiving/b1e9d30f08411e24eae6
 - https://gist.github.com/apneadiving/f1de3517a727e7596564
 
+#### Chaining Waterfalls
 
+    class AuthenticateUser
+      include Waterfall
+      attr_reader :email, :password
+      def initialize(email, password)
+        @email, @password = email, password
+      end
+      
+      def call
+        self 
+          .chain { }
+      end
+    end
+    
+    class We
+
+
+  def call
+    if user = User.authenticate(context.email, context.password)
+      context.user = user
+      context.token = user.secret_token
+    else
+      context.fail!(message: "authenticate_user.failure")
+    end
+  end
 #### Rationale
 Coding is all about writing a flow of commands.
 
