@@ -71,12 +71,8 @@ See examples:
           .chain { @referrer = User.find_by(id: @referrer_id) }
           .when_falsy { valid? }
             .dam { errors }
-          .chain_wf(invitee: :authenticated_user) do
-            AuthenticateFromInvitationToken.new(token)
-          end
-          .chain do |outflow|
-            referrer.complete_affiliation_for(outflow[:invitee])
-          end
+          .chain_wf(invitee: :authenticated_user) { AuthenticateFromInvitationToken.new(token) }
+          .chain { |outflow| referrer.complete_affiliation_for(outflow[:invitee]) }
       end
     end
 
