@@ -54,30 +54,42 @@ See examples:
 
 #### Chaining Waterfalls
 
-    class AuthenticateUser
+CreateOrder, ChargeCard, SendThankYou
+    class ProcessOrder
       include Waterfall
-      attr_reader :email, :password
+      include ActiveModel::Validations
+      
+      attr_reader :email, :password, :user
       def initialize(email, password)
         @email, @password = email, password
       end
       
       def call
         self 
-          .chain { }
+          .when_falsy { @user = User.authenticate(email, password) }
+            .dam do
+              errors.add(:authentication, 'failed')
+              errors
+            end
+          .chain(:authenticated_user) { user }
       end
     end
     
-    class We
-
-
-  def call
-    if user = User.authenticate(context.email, context.password)
-      context.user = user
-      context.token = user.secret_token
-    else
-      context.fail!(message: "authenticate_user.failure")
+    class Logger
+      include Waterfall
+      attr_reader :current_user, :action, :payload
+      
+      def initialize(current_user, action, payload)
+        @current_user, @action, @payload = current_user, action, payload
+      end
+      
+      def call
+        self
+          .chain
+      end
     end
-  end
+
+
 #### Rationale
 Coding is all about writing a flow of commands.
 
