@@ -125,10 +125,10 @@ Generally you basically go on, unless something wrong happens. Whenever this hap
 
 When conditions stack up, readability decreases. One way to solve it is to create abstractions (service objects or the like). Some gems suggest a nice approach like [light service](https://github.com/adomokos/light-service) and [interactor](https://github.com/collectiveidea/interactor).
 
-I like these approaches, but I dont like to have to write a class each time I need to chain services. Or I even dont want to create a class each time I need to chain something.
+I like these approaches, but I dont like to have to write a class each time I need to chain services. Or I even dont want to create a class each time I need to chain something. My take on this was to create `waterfall`.
 
-[here are some slides](https://slides.com/apneadiving/service-objects-waterfall-rails/live) to explain service objects and compare libraries.
-My take on this was to create `waterfall`.
+[Here are some slides](https://slides.com/apneadiving/service-objects-waterfall-rails/live) to explain service objects and compare libraries.
+
 
 
 Thanks
