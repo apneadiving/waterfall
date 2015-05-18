@@ -127,7 +127,9 @@ When conditions stack up, readability decreases. One way to solve it is to creat
 
 I like these approaches, but I dont like to have to write a class each time I need to chain services. Or I even dont want to create a class each time I need to chain something.
 
+[here are some slides](https://slides.com/apneadiving/service-objects-waterfall-rails/live) to explain service objects and compare libraries.
 My take on this was to create `waterfall`.
+
 
 Thanks
 =========
