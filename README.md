@@ -15,7 +15,7 @@ When conditions stack up, readability decreases. One way to solve it is to creat
 * how to call a service within a service?
 * how to chain services / commands
 
-Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails/live) to explain service objects and compare libraries.
+Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails/live).
 
 Check the [wiki for details](https://github.com/apneadiving/waterfall/wiki).
 
