@@ -6,10 +6,6 @@ module Waterfall
     end
 
     def chained_waterfall(child_waterfall, &block)
-      unless waterfall?(child_waterfall)
-        raise "Your inflow is not a waterfall, but a #{ child_waterfall.class }"
-      end
-
       child_waterfall.call unless child_waterfall.flowing?
 
       if child_waterfall.dammed?

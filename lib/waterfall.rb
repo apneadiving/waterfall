@@ -22,10 +22,10 @@ module Waterfall
     handler
   end
 
-  def chain(var_name = nil, &block)
+  def chain(mapping_or_var_name = nil, &block)
     _wf_run do
       ::Waterfall::Chain
-        .new(self, var_name)
+        .new(self, mapping_or_var_name)
         .call(&block)
     end
   end
