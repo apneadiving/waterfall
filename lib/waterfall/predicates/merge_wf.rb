@@ -7,8 +7,12 @@ module Waterfall
 
     def call(&block)
       child_waterfall = yield(*yield_args)
-      merge_waterfalls(child_waterfall)
-    end
 
+      chained_waterfall(child_waterfall) do
+        child_waterfall.outflow.each do |k, v|
+          @root.update_outflow(k, v)
+        end
+      end
+    end
   end
 end

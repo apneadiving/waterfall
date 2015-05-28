@@ -14,5 +14,14 @@ module Waterfall
         @root.update_outflow(@var_name, output) if @var_name
       end
     end
+
+    def map_waterfalls(child_waterfall, mapping)
+      mapping ||= {}
+      chained_waterfall(child_waterfall) do
+        mapping.each do |k, v|
+          @root.update_outflow(k, child_waterfall.outflow[v])
+        end
+      end
+    end
   end
 end

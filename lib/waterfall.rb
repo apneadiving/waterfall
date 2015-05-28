@@ -4,7 +4,6 @@ require 'waterfall/predicates/on_dam'
 require 'waterfall/predicates/when_falsy'
 require 'waterfall/predicates/when_truthy'
 require 'waterfall/predicates/chain'
-require 'waterfall/predicates/chain_wf'
 require 'waterfall/predicates/merge_wf'
 
 module Waterfall
@@ -32,11 +31,7 @@ module Waterfall
   end
 
   def chain_wf(mapping_hash = nil, &block)
-    _wf_run do
-      ::Waterfall::ChainWf
-        .new(self, mapping_hash)
-        .call(&block)
-    end
+    chain(mapping_hash, &block)
   end
 
   def merge_wf(&block)
