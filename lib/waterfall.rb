@@ -31,7 +31,7 @@ module Waterfall
     end
   end
 
-  def chain_wf(mapping_hash = {}, &block)
+  def chain_wf(mapping_hash = nil, &block)
     _wf_run do
       ::Waterfall::ChainWf
         .new(self, mapping_hash)

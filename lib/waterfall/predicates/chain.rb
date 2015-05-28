@@ -7,8 +7,12 @@ module Waterfall
 
     def call(&block)
       output = yield(*yield_args)
-      @root.update_outflow(@var_name, output) if @var_name
-    end
 
+      if waterfall?(output)
+        map_waterfalls(output, @var_name)
+      else
+        @root.update_outflow(@var_name, output) if @var_name
+      end
+    end
   end
 end

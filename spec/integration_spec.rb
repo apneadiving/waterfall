@@ -81,13 +81,13 @@ describe 'Wf' do
           it "when passed as an instance responding to call" do
             expect(waterfall).to receive(:call).once.and_call_original
             wf
-              .chain_wf { waterfall }
+              .chain { waterfall }
           end
 
           it "already called" do
             expect(waterfall).to receive(:call).once.and_call_original
             wf
-              .chain_wf { waterfall.call }
+              .chain { waterfall.call }
           end
         end
       end
@@ -196,7 +196,7 @@ describe 'Wf' do
 
     it "error propagates" do
       wf
-        .chain_wf { FailingChain.new }
+        .chain { FailingChain.new }
         .chain    { @foo = 1 }
         .on_dam   { |error_pool| @error = error_pool }
 
@@ -222,7 +222,7 @@ describe 'Wf' do
 
     class FakeService1 < FakeServiceBase
       def call
-        self.chain_wf { SubFakeService1.new }
+        self.chain { SubFakeService1.new }
       end
     end
 
@@ -250,10 +250,10 @@ describe 'Wf' do
       expect_any_instance_of(FakeService4).to_not receive(:rollback)
 
       MasterFakeService.new
-        .chain_wf { FakeService1.new }
-        .chain_wf { FakeService2.new }
-        .chain_wf { FakeService3.new }
-        .chain_wf { FakeService4.new }
+        .chain { FakeService1.new }
+        .chain { FakeService2.new }
+        .chain { FakeService3.new }
+        .chain { FakeService4.new }
     end
 
     it "calls rollback on executed waterfalls" do
@@ -265,10 +265,10 @@ describe 'Wf' do
       expect_any_instance_of(FakeService4).to_not receive(:rollback)
 
       MasterFakeService.new
-        .chain_wf { FakeService1.new }
-        .chain_wf { FakeService2.new }
-        .chain_wf { FakeService3.new }
-        .chain_wf { FakeService4.new }
+        .chain { FakeService1.new }
+        .chain { FakeService2.new }
+        .chain { FakeService3.new }
+        .chain { FakeService4.new }
         .on_dam   { }
     end
 
