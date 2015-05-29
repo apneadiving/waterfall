@@ -90,6 +90,7 @@ Wf.new.chain(:foo) { 1 }
 Wf.new.chain{|outflow| outflow[:foo] = 1 }
 Wf.new.chain{|outflow| outflow.foo = 1 }
 Wf.new.chain{|outflow, waterfall| waterfall.update_outflow(:foo, 1) }
+Wf.new.chain{|outflow, waterfall| waterfall.outflow.foo = 1 }
 ```
 ##### when block returns a waterfall
 
@@ -225,7 +226,7 @@ describe AuthenticateUser do
     end
 
     it "provides the user" do
-      expect(service.outflow[:user]).to eq(user)
+      expect(service.outflow.user).to eq(user)
     end
   end
 
