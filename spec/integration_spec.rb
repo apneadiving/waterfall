@@ -272,5 +272,21 @@ describe 'Wf' do
         .on_dam   { }
     end
 
+    it "doesnt call rollback if waterfall undammed" do
+      expect_any_instance_of(MasterFakeService).to_not receive(:rollback)
+      expect_any_instance_of(FakeService1).to_not      receive(:rollback)
+      expect_any_instance_of(SubFakeService1).to_not   receive(:rollback)
+      expect_any_instance_of(FakeService2).to_not      receive(:rollback)
+      expect_any_instance_of(FakeService3).to_not      receive(:rollback)
+      expect_any_instance_of(FakeService4).to_not      receive(:rollback)
+
+      MasterFakeService.new
+        .chain { FakeService1.new }
+        .chain { FakeService2.new }
+        .chain { FakeService3.new }
+        .chain { FakeService4.new }
+        .on_dam {|errors, waterfall| waterfall.undam }
+    end
+
   end
 end

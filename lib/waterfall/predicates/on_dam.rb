@@ -6,10 +6,9 @@ module Waterfall
     end
 
     def call(&block)
-      if @root.dammed?
-        @root._wf_rollback(rollback_self: false)
-        yield @root.error_pool, @root
-      end
+      return unless @root.dammed?
+      yield @root.error_pool, @root
+      @root._wf_rollback(rollback_self: false) if @root.dammed?
     end
   end
 end

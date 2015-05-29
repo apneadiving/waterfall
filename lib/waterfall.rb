@@ -53,6 +53,10 @@ module Waterfall
     @error_pool = obj
   end
 
+  def undam
+    dam nil
+  end
+
   def dammed?
     !error_pool.nil?
   end
