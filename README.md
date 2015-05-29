@@ -27,6 +27,15 @@ If a main waterfall chains another waterfall and the child waterfall is dammed, 
 
 The point is to be able to be able to chain an expected set of actions whenever everything works fine. And to be able to quickly stop and get the errors back whenever something wrong happens.
 
+## Installation
+
+There exists a gem on rubygem with the same name but its not mine :)
+
+For instalation:
+
+    gem 'waterfall', git: 'git://github.com/apneadiving/waterfall.git'
+
+
 ## Waterfall mixin
 
 ### Overview
