@@ -32,18 +32,19 @@ The point is to be able to be able to chain an expected set of actions whenever 
 ### Overview
 
 The Following are equivalent:
+```ruby
 
-    class MyService
-      include Waterfall
+class MyService
+  include Waterfall
 
-      def call
-        self.chain{ 1 + 1 }
-      end
-    end
+  def call
+    self.chain{ 1 + 1 }
+  end
+end
 
-    Wf.new.chain{ 1 + 1 }
-    MyService.new.call
-
+Wf.new.chain{ 1 + 1 }
+MyService.new.call
+```
 
 This illustrates one convention classes including the mixin should obey: respond to `call`
 
@@ -63,14 +64,14 @@ Thus you:
 ### chain(name_or_mapping = nil, &block) | block signature: (outflow, waterfall)
 
 Chain is the main predicate, what it does depends on what the block returns
-
-    # main waterfall
-    Wf.new
-      .chain(foo: :bar) do
-        # child waterfall
-        Wf.new.chain(:bar){ 1 }.chain(:baz){ 2 }.chain{ 3 }
-      end
-
+```ruby
+ # main waterfall
+ Wf.new
+   .chain(foo: :bar) do
+     # child waterfall
+     Wf.new.chain(:bar){ 1 }.chain(:baz){ 2 }.chain{ 3 }
+   end
+```
 ##### when block doesnt return a waterfall
 
 The child waterfall would have the following outflow: `{ bar: 1, baz: 2 }`
@@ -79,10 +80,11 @@ This illustrates that when the block returns a value which is not a waterfall, i
 
 Be aware those are equivalent:
 
-    Wf.new.chain(:foo) { 1 }
-    Wf.new.chain{|outflow| outflow[:foo] = 1 }
-    Wf.new.chain{|outflow, waterfall| waterfall.update_outflow(:foo, 1) }
-
+```ruby
+Wf.new.chain(:foo) { 1 }
+Wf.new.chain{|outflow| outflow[:foo] = 1 }
+Wf.new.chain{|outflow, waterfall| waterfall.update_outflow(:foo, 1) }
+```
 ##### when block returns a waterfall
 
 The main waterfall would have the following outflow: `{ foo: 1 }`
@@ -100,14 +102,16 @@ It may look useless, because most of the time you may not rename, but... It make
 
 This predicate must ***always*** be used followed with `dam` like:
 
-    Wf.new
-      .chain(:foo) { 1 } 
-      .when_falsy { true } 
-       .dam { "this wouldnt be executed"  }
-      .when_falsy { false } 
-       .dam { "errrrr"  }
-      .chain(:bar) { 2 } 
-      .on_dam {|error_pool| puts error_pool  }
+```ruby
+Wf.new
+  .chain(:foo) { 1 } 
+  .when_falsy { true } 
+   .dam { "this wouldnt be executed"  }
+  .when_falsy { false } 
+   .dam { "errrrr"  }
+  .chain(:bar) { 2 } 
+  .on_dam {|error_pool| puts error_pool  }
+```
 
 If the block returns a falsy value, it executes the `dam` block, which will store the returned value in the `error_pool`.
 
@@ -119,9 +123,10 @@ Its `error_pool` would be `"errrrr"` and it would be `puts` as a result of the `
 
 Be aware those are equivalent:
 
-    Wf.new.when_falsy{ false }.dam{ 'errrr' }
-    Wf.new.chain{ |outflow, waterfall| waterfall.dam('errrr') unless false }
-
+```ruby
+Wf.new.when_falsy{ false }.dam{ 'errrr' }
+Wf.new.chain{ |outflow, waterfall| waterfall.dam('errrr') unless false }
+```
 
 ### when_truthy(&block) | block signature: (error_pool, waterfall)
 
@@ -131,21 +136,23 @@ Behaves the same as `when_falsy` except it dams when its return value is truthy
 
 You may have noticed that I usually write:
 
-    class MyWaterfall
-      include Waterfall
-      def call
-        self.chain { 1 }
-      end
-    end
+```ruby
+class MyWaterfall
+  include Waterfall
+  def call
+    self.chain { 1 }
+  end
+end
 
-    Wf.new
-      .chain { MyWaterfall.new }
+Wf.new
+  .chain { MyWaterfall.new }
+```
 
 instead of
-
-    Wf.new
-      .chain { MyWaterfall.new.call }
-
+```ruby
+Wf.new
+  .chain { MyWaterfall.new.call }
+```
 Both are the same: if a block returns a waterfall which was not executed, it will execute it (hence the `call` convention)
 
 ## Error propagation
@@ -158,13 +165,13 @@ Whenever a a waterfall is dammed, all the following chains are skipped.
 ### Rollback
 
 But there is a bit more
-
-    Wf.new
-      .chain { WaterfallService1.new }
-      .chain { WaterfallService2.new }
-      .chain { WaterfallService3.new }
-      .on_dam {|errors| puts errors }
-
+```ruby
+Wf.new
+  .chain { WaterfallService1.new }
+  .chain { WaterfallService2.new }
+  .chain { WaterfallService3.new }
+  .on_dam {|errors| puts errors }
+```
 Imagine `WaterfallService2` is dammed. If your service fails, you have to undo what must be undone yourself since failure can happen in the middle of the process. But what about all the previous services I called?
 
 Well failure has to propagate and things done **before** could be undone.
@@ -174,63 +181,63 @@ If ever you implement a `rollback` instance method, it would be executed for eac
 ## Testing a Waterfall service
 
 Say I have this service:
+```ruby
+class AuthenticateUser
+  include Waterfall
+  include ActiveModel::Validations
 
-    class AuthenticateUser
-      include Waterfall
-      include ActiveModel::Validations
+  validates :user, presence: true
+  attr_reader :user
 
-      validates :user, presence: true
-      attr_reader :user
+  def initialize(email, password)
+    @email, @password = email, @password
+  end
 
-      def initialize(email, password)
-        @email, @password = email, @password
-      end
-
-      def call
-        self
-          .chain { @user = User.authenticate(@email, @password) }
-          .when_falsy { valid? }
-             .dam { errors }
-          .chain(:user) { user }
-      end
-    end
-
+  def call
+    self
+      .chain { @user = User.authenticate(@email, @password) }
+      .when_falsy { valid? }
+         .dam { errors }
+      .chain(:user) { user }
+  end
+end
+```
 I could spec it this way:
+```ruby
+describe AuthenticateUser do
+  subject(:service) { AuthenticateUser.new("john@example.com", "secret").call }
 
-    describe AuthenticateUser do
-      subject(:service) { AuthenticateUser.new("john@example.com", "secret").call }
+  context "when given valid credentials" do
+    let(:user) { double(:user) }
 
-      context "when given valid credentials" do
-        let(:user) { double(:user) }
-
-        before do
-          allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(user)
-        end
-
-        it "succeeds" do
-          expect(service.dammed?).to be false
-        end
-
-        it "provides the user" do
-          expect(service.outflow[:user]).to eq(user)
-        end
-      end
-
-      context "when given invalid credentials" do
-        before do
-          allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(nil)
-        end
-
-        it "fails" do
-          expect(service.dammed?).to be true
-        end
-
-        it "provides a failure message" do
-          expect(service.error_pool).to be_present
-        end
-      end  
+    before do
+      allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(user)
     end
 
+    it "succeeds" do
+      expect(service.dammed?).to be false
+    end
+
+    it "provides the user" do
+      expect(service.outflow[:user]).to eq(user)
+    end
+  end
+
+  context "when given invalid credentials" do
+    before do
+      allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(nil)
+    end
+
+    it "fails" do
+      expect(service.dammed?).to be true
+    end
+
+    it "provides a failure message" do
+      expect(service.error_pool).to be_present
+    end
+  end  
+end
+```
 Examples
 =========
 Check the [wiki for other examples](https://github.com/apneadiving/waterfall/wiki).
