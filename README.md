@@ -31,7 +31,7 @@ The point is to be able to be able to chain an expected set of actions whenever 
 
 There exists a gem on rubygem with the same name but its not mine :)
 
-For instalation:
+For installation:
 
     gem 'waterfall', git: 'git://github.com/apneadiving/waterfall.git'
 
