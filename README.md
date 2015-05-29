@@ -76,9 +76,7 @@ Thus you:
 Doing 
 ```ruby
  Wf.new
-   .chain(foo: :bar) do
-     Wf.new.chain(:bar){ 1 }
-   end
+   .chain(foo: :bar) { Wf.new.chain(:bar){ 1 } }
 ```
 
 is the same as doing:
