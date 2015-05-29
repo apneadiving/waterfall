@@ -171,9 +171,7 @@ Wf.new.chain{ |outflow, waterfall| waterfall.dam('errrr') unless false }
 Behaves the same as `when_falsy` except it dams when its return value is truthy
 
 ## Syntactic sugar
-
-You may have noticed that I usually write:
-
+Given:
 ```ruby
 class MyWaterfall
   include Waterfall
@@ -181,11 +179,13 @@ class MyWaterfall
     self.chain { 1 }
   end
 end
+```
+You may have noticed that I usually write:
 
+```ruby
 Wf.new
   .chain { MyWaterfall.new }
 ```
-
 instead of
 ```ruby
 Wf.new
