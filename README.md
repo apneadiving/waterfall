@@ -83,12 +83,12 @@ is the same as doing:
 
 ```ruby
  Wf.new
-   .chain do |outflow, main|
+   .chain do |outflow, parent_waterfall|
      child = Wf.new.chain(:bar){ 1 }
      if child.dammed?
-       main.dam(child.error_pool)
+       parent_waterfall.dam(child.error_pool)
      else
-       main.ouflow.foo = child.outflow.bar  
+       parent_waterfall.ouflow.foo = child.outflow.bar  
      end
    end
 ```
