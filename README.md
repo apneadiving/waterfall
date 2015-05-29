@@ -1,5 +1,5 @@
-Waterfall
-=========
+![Waterfall Logo](http://apneadiving.github.io/images/waterfall_logo.png)
+
 #### Goal
 
 Be able to chain ruby commands, and treat them like a flow.
