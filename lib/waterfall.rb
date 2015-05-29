@@ -86,8 +86,10 @@ module Waterfall
   end
 
   def _wf_rollback(arg = {rollback_self: true })
+    return if @_wf_rollbacked
     rollback if respond_to?(:rollback) && arg[:rollback_self]
     executed_waterfalls.each(&:_wf_rollback)
+    @_wf_rollbacked = true
   end
 end
 

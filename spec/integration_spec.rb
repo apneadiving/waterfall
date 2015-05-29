@@ -256,7 +256,7 @@ describe 'Wf' do
         .chain { FakeService4.new }
     end
 
-    it "calls rollback on executed waterfalls" do
+    it "calls rollback once on executed waterfalls" do
       expect_any_instance_of(MasterFakeService).to_not receive(:rollback)
       expect_any_instance_of(FakeService1).to receive(:rollback)
       expect_any_instance_of(SubFakeService1).to receive(:rollback)
@@ -269,6 +269,7 @@ describe 'Wf' do
         .chain { FakeService2.new }
         .chain { FakeService3.new }
         .chain { FakeService4.new }
+        .on_dam   { }
         .on_dam   { }
     end
 
