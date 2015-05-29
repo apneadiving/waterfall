@@ -48,9 +48,13 @@ MyService.new.call
 
 This illustrates one convention classes including the mixin should obey: respond to `call`
 
-### Advice
+### Outputs
 
-Using Rails, I usually `include ActiveModel::Validations` in my services.
+Each waterfall has its own `outflow` and `error_pool`.
+
+`outflow` is an Openstruct so you can get/set its property like a hash or like a standard object.
+
+For the `error_pool`, its up to you. But using Rails, I usually `include ActiveModel::Validations` in my services.
 
 Thus you:
 
@@ -58,6 +62,7 @@ Thus you:
 * can deal with multiple errors
 * support I18n out of the box
 * can use your model errors out of the box
+
 
 ## Predicates
 
@@ -83,6 +88,7 @@ Be aware those are equivalent:
 ```ruby
 Wf.new.chain(:foo) { 1 }
 Wf.new.chain{|outflow| outflow[:foo] = 1 }
+Wf.new.chain{|outflow| outflow.foo = 1 }
 Wf.new.chain{|outflow, waterfall| waterfall.update_outflow(:foo, 1) }
 ```
 ##### when block returns a waterfall
