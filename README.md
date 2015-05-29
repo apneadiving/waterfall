@@ -254,6 +254,33 @@ describe AuthenticateUser do
   end  
 end
 ```
+
+Better understanding
+=========
+Doing 
+```ruby
+ Wf.new
+   .chain(foo: :bar) do
+     Wf.new.chain(:bar){ 1 }
+   end
+```
+
+is the same as doing:
+
+```ruby
+ Wf.new
+   .chain do |outflow, main|
+     child = Wf.new.chain(:bar){ 1 }
+     if child.dammed?
+       main.dam(child.error_pool)
+     else
+       main.ouflow.foo = child.outflow.bar  
+     end
+   end
+```
+
+I guess you better get the chaining power this way
+
 Examples
 =========
 Check the [wiki for other examples](https://github.com/apneadiving/waterfall/wiki).
