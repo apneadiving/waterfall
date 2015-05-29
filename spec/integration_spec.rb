@@ -40,16 +40,6 @@ describe 'Wf' do
     describe "chaining waterfalls" do
 
       shared_examples "a waterfall chain" do
-        describe 'merge_wf' do
-          it "merges the two outflows" do
-            wf
-              .merge_wf { waterfall }
-
-            expect(wf.outflow[:foo]).to eq waterfall.outflow[:foo]
-            expect(wf.outflow[:bar]).to eq waterfall.outflow[:bar]
-          end
-        end
-
         describe 'chain_wf' do
           it "takes expected vars only and rename them" do
             wf

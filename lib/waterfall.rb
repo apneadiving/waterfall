@@ -1,10 +1,10 @@
+require 'ostruct'
 require 'waterfall/version'
 require 'waterfall/predicates/base'
 require 'waterfall/predicates/on_dam'
 require 'waterfall/predicates/when_falsy'
 require 'waterfall/predicates/when_truthy'
 require 'waterfall/predicates/chain'
-require 'waterfall/predicates/merge_wf'
 
 module Waterfall
 
@@ -32,14 +32,6 @@ module Waterfall
 
   def chain_wf(mapping_hash = nil, &block)
     chain(mapping_hash, &block)
-  end
-
-  def merge_wf(&block)
-    _wf_run do
-      ::Waterfall::MergeWf
-        .new(self)
-        .call(&block)
-    end
   end
 
   def on_dam(&block)
@@ -80,7 +72,7 @@ module Waterfall
   def _wf_run(&block)
     @flowing = true
     @executed_waterfalls ||= []
-    @outflow ||= {}
+    @outflow ||= OpenStruct.new({})
     yield unless dammed?
     self
   end
