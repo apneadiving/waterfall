@@ -244,13 +244,15 @@ end
 I could spec it this way:
 ```ruby
 describe AuthenticateUser do
-  subject(:service) { AuthenticateUser.new("john@example.com", "secret").call }
+  let(:email)    { 'email@email.com' }
+  let(:password) { 'password' }
+  subject(:service) { AuthenticateUser.new(email, password).call }
 
   context "when given valid credentials" do
     let(:user) { double(:user) }
 
     before do
-      allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(user)
+      allow(User).to receive(:authenticate).with(email, password).and_return(user)
     end
 
     it "succeeds" do
@@ -264,7 +266,7 @@ describe AuthenticateUser do
 
   context "when given invalid credentials" do
     before do
-      allow(User).to receive(:authenticate).with("john@example.com", "secret").and_return(nil)
+      allow(User).to receive(:authenticate).with(email, password).and_return(nil)
     end
 
     it "fails" do
