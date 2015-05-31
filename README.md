@@ -26,7 +26,7 @@ Wf.new
   .when_falsy { @user.update(user_params) }
     .dam { @user.errors }
   .chain { render json: @user }
-  .on_dam do |errors| render json: { errors: errors.full_messages }, status: 422 }
+  .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
 ```
 
 And you can nest, and/or chain waterfalls.
