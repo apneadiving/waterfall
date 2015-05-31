@@ -14,7 +14,9 @@ Wf.new
   .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
 ```
 
-And you can nest and/or chain waterfalls.
+There is no reason to use waterfall for a simple case like this.
+
+Waterfalls reveal their power when logic is more complicated and above all when you start having independent services calling each other.
 
 #### Rationale
 Coding is all about writing a flow of commands.
