@@ -2,7 +2,7 @@ language: ruby
 rvm:
   - 2.0.0
   - 2.1.0
-script: rspec spec
+script: bundle exec rspec spec
 addons:
   code_climate:
     repo_token: 06ba7b4d95c2d056ef2b66c86e9d69f24dceee54354c1ab2ce1397f8f309b0a4
