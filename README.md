@@ -9,7 +9,9 @@ Coding is all about writing a flow of commands.
 
 Generally you basically go on, unless something wrong happens. Whenever this happens you have to halt the flow and send feedback to the user.
 
-When conditions stack up, readability decreases. One way to solve it is to create abstractions (service objects or the like). There some questions arise:
+When conditions stack up, readability decreases.
+
+One way to solve it is to create abstractions to wrap your business logic (service objects or the like). There some questions arise:
 * what should a good service return?
 * how to handle errors?
 * how to call a service within a service?
@@ -144,12 +146,12 @@ This predicate must ***always*** be used followed with `dam` like:
 
 ```ruby
 Wf.new
-  .chain(:foo) { 1 } 
-  .when_falsy { true } 
+  .chain(:foo) { 1 }
+  .when_falsy { true }
    .dam { "this wouldnt be executed"  }
-  .when_falsy { false } 
+  .when_falsy { false }
    .dam { "errrrr"  }
-  .chain(:bar) { 2 } 
+  .chain(:bar) { 2 }
   .on_dam {|error_pool| puts error_pool  }
 ```
 
@@ -197,7 +199,7 @@ Both are the same: if a block returns a waterfall which was not executed, it wil
 
 ## Error propagation
 
-Whenever a a waterfall is dammed, all the following chains are skipped. 
+Whenever a a waterfall is dammed, all the following chains are skipped.
 
 * all the following chains are skipped
 * all `on_dam` blocks are executed
@@ -278,7 +280,7 @@ describe AuthenticateUser do
     it "provides a failure message" do
       expect(service.error_pool).to be_present
     end
-  end  
+  end
 end
 ```
 

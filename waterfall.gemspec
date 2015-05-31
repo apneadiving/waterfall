@@ -7,15 +7,15 @@ Gem::Specification.new do |spec|
   spec.name          = "waterfall"
   spec.version       = Waterfall::VERSION
   spec.authors       = ["Benjamin Roth"]
-  spec.email         = ["apnea.diving.deep@gmail.com"]
-  spec.description   = %q{A way to chain ruby services, like promises (or monads)}
-  spec.summary       = %q{A way to chain ruby services, like promises (or monads)}
+  spec.email         = ["benjamin@rubyist.fr"]
+  spec.description   = %q{A slice of functional programming to chain ruby services and blocks. Make them flow!}
+  spec.summary       = %q{A slice of functional programming to chain ruby services and blocks. Make them flow!}
   spec.homepage      = "https://github.com/apneadiving/waterfall"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = spec.files.grep(%r{^(spec)/})
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
