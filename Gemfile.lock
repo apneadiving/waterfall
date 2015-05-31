@@ -6,7 +6,11 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    codeclimate-test-reporter (0.4.7)
+      simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
+    docile (1.1.5)
+    json (1.8.2)
     method_source (0.8.2)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -15,6 +19,11 @@ GEM
     pry-nav (0.2.4)
       pry (>= 0.9.10, < 0.11.0)
     rake (10.3.2)
+    simplecov (0.10.0)
+      docile (~> 1.1.0)
+      json (~> 1.8)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.0)
     slop (3.6.0)
 
 PLATFORMS
@@ -22,6 +31,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.3)
+  codeclimate-test-reporter
   pry (> 0.10)
   pry-nav
   rake
