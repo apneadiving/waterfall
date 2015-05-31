@@ -1,5 +1,6 @@
 ![Waterfall Logo](http://apneadiving.github.io/images/waterfall_logo.png)
 [![Code Climate](https://codeclimate.com/github/apneadiving/waterfall/badges/gpa.svg)](https://codeclimate.com/github/apneadiving/waterfall)
+[![Test Coverage](https://codeclimate.com/github/apneadiving/waterfall/badges/coverage.svg)](https://codeclimate.com/github/apneadiving/waterfall/coverage)
 #### Goal
 
 Be able to chain ruby commands, and treat them like a flow.
