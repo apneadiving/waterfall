@@ -15,9 +15,7 @@ Wf.new
   .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
 ```
 
-There is no reason to use waterfall for a simple case like this.
-
-Waterfalls reveal their power when logic is more complicated, to write intention revealing code and above all when you start having independent services calling each other.
+When logic is complicated, waterfalls reveal their true power and let you write intention revealing code. Above all they excel at chaining services.
 
 #### Rationale
 Coding is all about writing a flow of commands.
