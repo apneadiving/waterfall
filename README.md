@@ -16,7 +16,7 @@ Wf.new
 
 There is no reason to use waterfall for a simple case like this.
 
-Waterfalls reveal their power when logic is more complicated and above all when you start having independent services calling each other.
+Waterfalls reveal their power when logic is more complicated, to write intention revealing code and above all when you start having independent services calling each other.
 
 #### Rationale
 Coding is all about writing a flow of commands.
