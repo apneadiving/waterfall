@@ -15,7 +15,7 @@ Wf.new
   .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
 ```
 
-When logic is complicated, waterfalls reveal their true power and let you write intention revealing code. Above all they excel at chaining services.
+When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
 #### Rationale
 Coding is all about writing a flow of commands.
