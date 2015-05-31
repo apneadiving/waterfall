@@ -19,6 +19,18 @@ One way to solve it is to create abstractions to wrap your business logic (servi
 
 Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails/live).
 
+## Basic example
+
+```ruby
+Wf.new
+  .when_falsy { @user.update(user_params) }
+    .dam { @user.errors }
+  .chain { render json: @user }
+  .on_dam do |errors| render json: { errors: errors.full_messages }, status: 422 }
+```
+
+And you can nest, and/or chain waterfalls.
+
 ## Wf object
 
 The `Wf` class just includes the `Waterfall` module. It makes it easy to create standalone waterfalls mostly to chain actions or to chain services including `Waterfall` or returning a `Wf` object.
@@ -75,7 +87,7 @@ Thus you:
 * can use your model errors out of the box
 
 ## Illustration of chaining
-Doing 
+Doing
 ```ruby
  Wf.new
    .chain(foo: :bar) { Wf.new.chain(:bar){ 1 } }
@@ -91,13 +103,13 @@ is the same as doing:
        if child.dammed?
          parent_waterfall.dam(child.error_pool)
        else
-         parent_waterfall.ouflow.foo = child.outflow.bar  
+         parent_waterfall.ouflow.foo = child.outflow.bar
        end
      end
    end
 ```
 
-I guess you better get the chaining power this way
+Hopefully you better get the chaining power this way.
 
 ## Predicates
 
