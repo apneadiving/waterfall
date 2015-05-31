@@ -4,6 +4,18 @@
 
 Be able to chain ruby commands, and treat them like a flow.
 
+#### Basic example
+
+```ruby
+Wf.new
+  .when_falsy { @user.update(user_params) }
+    .dam { @user.errors }
+  .chain { render json: @user }
+  .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
+```
+
+And you can nest and/or chain waterfalls.
+
 #### Rationale
 Coding is all about writing a flow of commands.
 
@@ -19,17 +31,6 @@ One way to solve it is to create abstractions to wrap your business logic (servi
 
 Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails/live).
 
-## Basic example
-
-```ruby
-Wf.new
-  .when_falsy { @user.update(user_params) }
-    .dam { @user.errors }
-  .chain { render json: @user }
-  .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
-```
-
-And you can nest, and/or chain waterfalls.
 
 ## Wf object
 
