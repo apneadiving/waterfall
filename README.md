@@ -56,7 +56,7 @@ For installation:
 
 ### Overview
 
-The Following are equivalent:
+The following are equivalent:
 ```ruby
 
 class MyService
@@ -228,9 +228,9 @@ Wf.new
   .chain { WaterfallService3.new }
   .on_dam {|errors| puts errors }
 ```
-Imagine `WaterfallService2` is dammed. If your service fails, you have to undo what must be undone yourself since failure can happen in the middle of the process. But what about all the previous services I called?
+Imagine `WaterfallService2` is dammed. If your service fails in the middle of the flow, what about all the changes from previous services that were called? 
 
-Well failure has to propagate and things done **before** could be undone.
+There has to be a mechanism to allow these previous calls to be undone.
 
 If ever you implement a `rollback` instance method, it would be executed for each of the previously called services. In our example, if `WaterfallService2` is dammed and `WaterfallService1` implements a `rollback` method, it would be executed once the `on_dam` is reached. Obviously `WaterfallService3` has not been called nor rollback during this process.
 
