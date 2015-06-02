@@ -88,6 +88,6 @@ end
 class Wf
   include Waterfall
   def initialize
-    @outflow = {}
+    @outflow = OpenStruct.new({})
   end
 end
