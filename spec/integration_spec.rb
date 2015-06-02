@@ -45,8 +45,8 @@ describe 'Wf' do
             wf
               .chain_wf(baz: :foo) { waterfall }
 
-            expect(wf.outflow).to_not have_key :foo
-            expect(wf.outflow).to_not have_key :bar
+            expect(wf.outflow.foo).to be nil
+            expect(wf.outflow.bar).to be nil
             expect(wf.outflow[:baz]).to eq waterfall.outflow[:foo]
           end
         end
