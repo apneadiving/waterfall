@@ -43,10 +43,12 @@ module Waterfall
 
   def dam(obj)
     @error_pool = obj
+    self
   end
 
   def undam
     dam nil
+    self
   end
 
   def dammed?
@@ -63,10 +65,12 @@ module Waterfall
 
   def update_outflow(key, value)
     @outflow[key] = value
+    self
   end
 
   def add_executed_waterfall(wf)
     @executed_waterfalls.push wf
+    self
   end
 
   def _wf_run(&block)
