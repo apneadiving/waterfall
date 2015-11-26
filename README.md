@@ -4,7 +4,9 @@
 [![Build Status](https://travis-ci.org/apneadiving/waterfall.svg?branch=master)](https://travis-ci.org/apneadiving/waterfall)
 #### Goal
 
-Be able to chain ruby commands, and treat them like a flow. Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails/live) for a refactoring example.
+Be able to chain ruby commands, and treat them like a flow. 
+
+Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails/live) for a refactoring example.
 
 
 #### Basic example
