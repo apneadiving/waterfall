@@ -34,7 +34,7 @@ One way to solve it is to create abstractions to wrap your business logic (servi
 * how to call a service within a service?
 * how to chain services / commands
 
-Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails/live).
+Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails).
 
 
 ## Wf object
