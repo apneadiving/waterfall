@@ -6,7 +6,7 @@
 
 Be able to chain ruby commands, and treat them like a flow. 
 
-Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails/live) for a refactoring example.
+Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails) for a refactoring example.
 
 
 #### Basic example
