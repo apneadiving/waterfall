@@ -132,11 +132,11 @@ Chain is the main predicate, what it does depends on what the block returns
      Wf.new.chain(:bar){ 1 }.chain(:baz){ 2 }.chain{ 3 }
    end
 ```
-##### when block doesnt return a waterfall
+##### when block doesn't return a waterfall
 
 The child waterfall would have the following outflow: `{ bar: 1, baz: 2 }`
 
-This illustrates that when the block returns a value which is not a waterfall, it stores the returned value of the block inside the `name_or_mapping` key of the `outflow` or doesnt store it if `name_or_mapping` is `nil`.
+This illustrates that when the block returns a value which is not a waterfall, it stores the returned value of the block inside the `name_or_mapping` key of the `outflow` or doesn't store it if `name_or_mapping` is `nil`.
 
 Be aware those are equivalent:
 
