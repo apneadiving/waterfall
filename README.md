@@ -64,7 +64,10 @@ For installation:
 
 The following are equivalent:
 ```ruby
+# 1
+Wf.new.chain{ 1 + 1 }
 
+# 2
 class MyService
   include Waterfall
 
@@ -73,7 +76,6 @@ class MyService
   end
 end
 
-Wf.new.chain{ 1 + 1 }
 MyService.new.call
 ```
 
