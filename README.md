@@ -305,6 +305,43 @@ describe AuthenticateUser do
   end
 end
 ```
+Syntax advice
+=========
+```ruby
+# this is valid
+self
+  .chain { Service1.new }
+  .chain { Service2.new }
+
+# this is equivalent
+self.chain { Service1.new }
+self.chain { Service2.new }
+
+# this is equivalent too
+chain { Service1.new }
+chain { Service2.new }
+
+# this is invalid Ruby due to the extra line
+self
+  .chain { Service1.new }
+  
+  .chain { Service2.new }
+```
+
+Tips
+=========
+### Conditional Flow
+In a service, there is one and single flow, so if you need conditionals to branch off, you can do:
+```ruby
+self.chain { Service1.new }
+
+if foo?
+  self.chain { Service2.new }
+else
+  self.chain { Service3.new }
+end
+```
+
 
 Examples
 =========
