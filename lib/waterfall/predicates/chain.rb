@@ -5,7 +5,7 @@ module Waterfall
       @root, @mapping_or_var_name = root, mapping_or_var_name
     end
 
-    def call(&block)
+    def call
       output = yield(*yield_args)
 
       if waterfall?(output)

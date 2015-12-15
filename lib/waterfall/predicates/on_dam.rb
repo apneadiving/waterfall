@@ -1,14 +1,13 @@
 module Waterfall
   class OnDam < Base
 
-    def initialize(root, &block)
+    def initialize(root)
       @root = root
     end
 
-    def call(&block)
+    def call
       return unless @root.dammed?
       yield @root.error_pool, @root
-      @root._wf_rollback(rollback_self: false) if @root.dammed?
     end
   end
 end

@@ -8,7 +8,7 @@ require 'waterfall/predicates/chain'
 
 module Waterfall
 
-  attr_reader :error_pool, :outflow, :flowing, :executed_waterfalls, :_wf_rolled_back
+  attr_reader :error_pool, :outflow, :flowing, :_wf_rolled_back
 
   def when_falsy(&block)
     handler = ::Waterfall::WhenFalsy.new(self)
@@ -68,31 +68,18 @@ module Waterfall
     self
   end
 
-  def add_executed_waterfall(wf)
-    @executed_waterfalls.push wf
-    self
-  end
-
   def _wf_run(&block)
     @flowing = true
-    @executed_waterfalls ||= []
     @outflow ||= OpenStruct.new({})
     yield unless dammed?
     self
   end
 
-  def _wf_rollback(arg = {rollback_self: true })
-    return if @_wf_rollbacked
-    rollback if respond_to?(:rollback) && arg[:rollback_self]
-    executed_waterfalls.each(&:_wf_rollback)
-    @_wf_rollbacked = true
-  end
 end
 
 class Wf
   include Waterfall
   def initialize
     @outflow = OpenStruct.new({})
-    @flowing = true
   end
 end

@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/apneadiving/waterfall.svg?branch=master)](https://travis-ci.org/apneadiving/waterfall)
 #### Goal
 
-Be able to chain ruby commands, and treat them like a flow. 
+Be able to chain ruby commands, and treat them like a flow.
 
 General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-legos).
 
@@ -226,23 +226,6 @@ Whenever a a waterfall is dammed, all the following chains are skipped.
 * all the following chains are skipped
 * all `on_dam` blocks are executed
 
-### Rollback
-
-But there is a bit more
-```ruby
-Wf.new
-  .chain { WaterfallService1.new }
-  .chain { WaterfallService2.new }
-  .chain { WaterfallService3.new }
-  .on_dam {|errors| puts errors }
-```
-Imagine `WaterfallService2` is dammed. If your service fails in the middle of the flow, what about all the changes from previous services that were called? 
-
-There has to be a mechanism to allow these previous calls to be undone.
-
-If ever you implement a `rollback` instance method, it would be executed for each of the previously called services. In our example, if `WaterfallService2` is dammed and `WaterfallService1` implements a `rollback` method, it would be executed once the `on_dam` is reached. Obviously `WaterfallService3` has not been called nor rollback during this process.
-
-
 ## Testing a Waterfall service
 
 Say I have this service:
@@ -324,7 +307,7 @@ chain { Service2.new }
 # this is invalid Ruby due to the extra line
 self
   .chain { Service1.new }
-  
+
   .chain { Service2.new }
 ```
 

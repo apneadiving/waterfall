@@ -5,11 +5,11 @@ module Waterfall
       @root = root
     end
 
-    def call(&block)
+    def call
       @output = yield(*yield_args)
     end
 
-    def dam(&block)
+    def dam
       if !@root.dammed? && @output
         @root.dam yield(*yield_args)
       end
