@@ -68,7 +68,7 @@ module Waterfall
     self
   end
 
-  def _wf_run(&block)
+  def _wf_run
     @flowing = true
     @outflow ||= OpenStruct.new({})
     yield unless dammed?
