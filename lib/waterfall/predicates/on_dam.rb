@@ -7,7 +7,7 @@ module Waterfall
 
     def call
       return unless @root.dammed?
-      yield @root.error_pool, @root
+      yield @root.error_pool, @root.outflow, @root
     end
   end
 end

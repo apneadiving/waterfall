@@ -219,6 +219,16 @@ Wf.new
 ```
 Both are the same: if a block returns a waterfall which was not executed, it will execute it (hence the `call` convention)
 
+### on_dam(&block) | block signature: (error_pool, outflow, waterfall)
+
+Its block is executed whenever the waterfall is dammed, skipped otherwise.
+
+```ruby
+Wf.new
+  .when_falsy { false }
+  .on_dam {|error_pool, outflow, waterfall| puts error_pool  }
+```
+
 ## Error propagation
 
 Whenever a a waterfall is dammed, all the following chains are skipped.
