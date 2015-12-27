@@ -51,12 +51,11 @@ The point is to be able to be able to chain an expected set of actions whenever 
 
 ## Installation
 
-There exists a gem on rubygem with the same name but its not mine :)
+For installation, in your gemfile:
 
-For installation:
-
-    gem 'waterfall', git: 'git://github.com/apneadiving/waterfall.git'
-
+    gem 'waterfall'
+    
+then `bundle` as usual.
 
 ## Waterfall mixin
 
