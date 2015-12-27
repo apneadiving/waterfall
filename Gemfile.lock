@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    waterfall (0.0.1)
+    waterfall (1.0.2)
 
 GEM
   remote: https://rubygems.org/
