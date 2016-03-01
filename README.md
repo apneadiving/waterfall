@@ -334,6 +334,53 @@ else
 end
 ```
 
+### Rails and transactions
+I'm used to wrap every single object involving database interactions within transactions, so it can be rolled back on error.
+Here is my usual setup:
+```ruby
+module Waterfall
+  extend ActiveSupport::Concern
+  
+  class Rollback < StandardError; end
+
+  def with_transaction(&block)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      yield
+      on_dam do
+        raise WordersCore::Rollback
+      end
+    end
+  rescue Waterfall::Rollback
+    self
+  end
+end
+```
+
+And to use it:
+```ruby
+class AuthenticateUser
+  include Waterfall
+  include ActiveModel::Validations
+
+  validates :user, presence: true
+  attr_reader :user
+
+  def initialize(email, password)
+    @email, @password = email, @password
+  end
+
+  def call
+    with_transaction do 
+      self
+        .chain { @user = User.authenticate(@email, @password) }
+        .when_falsy { valid? }
+          .dam { errors }
+        .chain(:user) { user }
+    end
+  end
+end
+```
+The huge benefit is that if you call services from services, everything will be rolled back.
 
 Examples
 =========
