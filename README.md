@@ -347,7 +347,7 @@ module Waterfall
     ActiveRecord::Base.transaction(requires_new: true) do
       yield
       on_dam do
-        raise WordersCore::Rollback
+        raise Waterfall::Rollback
       end
     end
   rescue Waterfall::Rollback
