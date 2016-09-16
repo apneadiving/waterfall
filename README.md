@@ -6,7 +6,7 @@
 
 Be able to chain ruby commands, and treat them like a flow.
 
-General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-legos).
+General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-lego).
 
 Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails) for a refactoring example.
 
