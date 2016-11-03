@@ -19,7 +19,6 @@ class AuthenticateUser
   include ActiveModel::Validations
 
   validates :user, presence: true
-  attr_reader :user
 
   def initialize(email, password)
     @email, @password = email, @password
@@ -32,6 +31,10 @@ class AuthenticateUser
          .dam { errors }
       .chain(:user) { user }
   end
+
+  private
+
+  attr_reader :user
 end
 ```
 and call it anywhere:
