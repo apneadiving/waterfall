@@ -21,7 +21,7 @@ class AuthenticateUser
   validates :user, presence: true
 
   def initialize(email, password)
-    @email, @password = email, @password
+    @email, @password = email, password
   end
 
   def call
