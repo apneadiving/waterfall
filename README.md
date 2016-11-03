@@ -40,7 +40,7 @@ and call it anywhere:
 Wf.new
   .chain(current_user: :user) { AuthenticateUser.new(params[:email], params[:password]) }
   .chain  { |outflow| render json: outflow.user }
-  .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
+  .on_dam { |errors|  render json: { errors: errors.full_messages }, status: 422 }
 ```
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
