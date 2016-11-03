@@ -42,7 +42,7 @@ and call it anywhere:
 ```ruby
 Wf.new
   .chain(current_user: :user) { AuthenticateUser.new(params[:email], params[:password]) }
-  .chain  { |outflow| render json: outflow.user }
+  .chain  { |outflow| render json: outflow.current_user }
   .on_dam { |errors|  render json: { errors: errors.full_messages }, status: 422 }
 ```
 
