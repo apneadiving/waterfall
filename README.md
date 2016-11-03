@@ -14,10 +14,32 @@ Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-ra
 #### Basic example
 
 ```ruby
+class AuthenticateUser
+  include Waterfall
+  include ActiveModel::Validations
+
+  validates :user, presence: true
+  attr_reader :user
+
+  def initialize(email, password)
+    @email, @password = email, @password
+  end
+
+  def call
+    self
+      .chain { @user = User.authenticate(@email, @password) }
+      .when_falsy { valid? }
+         .dam { errors }
+      .chain(:user) { user }
+  end
+end
+```
+and call it anywhere:
+
+```ruby
 Wf.new
-  .when_falsy { @user.update(user_params) }
-    .dam { @user.errors }
-  .chain { render json: @user }
+  .chain(current_user: :user) { AuthenticateUser.new(params[:email], params[:password]) }
+  .chain  { |outflow| render json: outflow.user }
   .on_dam { |errors| render json: { errors: errors.full_messages }, status: 422 }
 ```
 
@@ -237,29 +259,7 @@ Whenever a a waterfall is dammed, all the following chains are skipped.
 
 ## Testing a Waterfall service
 
-Say I have this service:
-```ruby
-class AuthenticateUser
-  include Waterfall
-  include ActiveModel::Validations
-
-  validates :user, presence: true
-  attr_reader :user
-
-  def initialize(email, password)
-    @email, @password = email, @password
-  end
-
-  def call
-    self
-      .chain { @user = User.authenticate(@email, @password) }
-      .when_falsy { valid? }
-         .dam { errors }
-      .chain(:user) { user }
-  end
-end
-```
-I could spec it this way:
+You could spec `AuthenticateUser` this way:
 ```ruby
 describe AuthenticateUser do
   let(:email)    { 'email@email.com' }
