@@ -6,6 +6,8 @@
 
 Be able to chain ruby commands, and treat them like a flow.
 
+It thus provides a new approach to flow control.
+
 General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-lego).
 
 Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails) for a refactoring example.
