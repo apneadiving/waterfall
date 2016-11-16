@@ -12,6 +12,16 @@ When logic is complicated, waterfalls show their true power and let you write in
 
 General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-lego).
 
+#### Overview
+
+A waterfall object has its own flow of commands, you can chain your commands and if something wrong happens, you dam the flow which bypasses the rest of the commands.
+
+Here is a basic representation:
+- green, the flow goes on `chain` by `chain`
+- red its bypassed and only `on_dam` blocks are executed.
+
+![Waterfall Logo](http://apneadiving.github.io/images/waterfall_principle.png)
+
 #### Example
 
 ```ruby
@@ -41,18 +51,7 @@ Wf.new
   .on_dam {|error|   puts(error)      }                    # report error
 ```
 
-#### Overview
-
-A waterfall object has its own flow of commands, you can chain your commands and if something wrong happens, you dam the flow which bypasses the rest of the commands.
-
-Here is a basic representation:
-- green, the flow goes on `chain` by `chain`
-- red its bypassed and only `on_dam` blocks are executed.
-
-![Waterfall Logo](http://apneadiving.github.io/images/waterfall_principle.png)
-
-
-Here is one illustration of our previous example.
+Which works like:
 
 ![Waterfall Logo](http://apneadiving.github.io/images/waterfall_full_example.png)
 
@@ -69,6 +68,8 @@ One way to solve it is to create abstractions to wrap your business logic (servi
 * how to handle errors?
 * how to call a service within a service?
 * how to chain services / commands
+
+Waterfall is my answer to these questions.
 
 ## Wf object
 
@@ -266,46 +267,6 @@ Whenever a a waterfall is dammed, all the following chains are skipped.
 * all the following chains are skipped
 * all `on_dam` blocks are executed
 
-## Testing a Waterfall service
-
-You could spec `AuthenticateUser` this way:
-```ruby
-describe AuthenticateUser do
-  let(:email)    { 'email@email.com' }
-  let(:password) { 'password' }
-  subject(:service) { AuthenticateUser.new(email, password).call }
-
-  context "when given valid credentials" do
-    let(:user) { double(:user) }
-
-    before do
-      allow(User).to receive(:authenticate).with(email, password).and_return(user)
-    end
-
-    it "succeeds" do
-      expect(service.dammed?).to be false
-    end
-
-    it "provides the user" do
-      expect(service.outflow.user).to eq(user)
-    end
-  end
-
-  context "when given invalid credentials" do
-    before do
-      allow(User).to receive(:authenticate).with(email, password).and_return(nil)
-    end
-
-    it "fails" do
-      expect(service.dammed?).to be true
-    end
-
-    it "provides a failure message" do
-      expect(service.error_pool).to be_present
-    end
-  end
-end
-```
 Syntax advice
 =========
 ```ruby
@@ -391,9 +352,53 @@ end
 ```
 The huge benefit is that if you call services from services, everything will be rolled back.
 
-Examples
-=========
-Check the [wiki for other examples](https://github.com/apneadiving/waterfall/wiki).
+## Testing a Waterfall service
+
+You could spec `AuthenticateUser` this way:
+```ruby
+describe AuthenticateUser do
+  let(:email)    { 'email@email.com' }
+  let(:password) { 'password' }
+  subject(:service) { AuthenticateUser.new(email, password).call }
+
+  context "when given valid credentials" do
+    let(:user) { double(:user) }
+
+    before do
+      allow(User).to receive(:authenticate).with(email, password).and_return(user)
+    end
+
+    it "succeeds" do
+      expect(service.dammed?).to be false
+    end
+
+    it "provides the user" do
+      expect(service.outflow.user).to eq(user)
+    end
+  end
+
+  context "when given invalid credentials" do
+    before do
+      allow(User).to receive(:authenticate).with(email, password).and_return(nil)
+    end
+
+    it "fails" do
+      expect(service.dammed?).to be true
+    end
+
+    it "provides a failure message" do
+      expect(service.error_pool).to be_present
+    end
+  end
+end
+```
+
+Examples / Presentations
+========================
+- Check the [wiki for other examples](https://github.com/apneadiving/waterfall/wiki).
+- [Structure and chain your POROs](http://slides.com/apneadiving/structure-and-chain-your-poros).
+- [Service objects implementations](https://slides.com/apneadiving/service-objects-waterfall-rails).
+- [Handling error in Rails](https://slides.com/apneadiving/handling-error-in-ruby-rails).
 
 Thanks
 =========
