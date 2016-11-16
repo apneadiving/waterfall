@@ -48,10 +48,10 @@ A waterfall object has its own flow of commands, you can chain your commands and
 Here is a basic representation:
 - green, the flow goes on `chain` by `chain`
 - red its bypassed and only `on_dam` blocks are executed.
-
+![Waterfall Logo](http://apneadiving.github.io/images/waterfall_principle.png)
 
 Here is one illustration of our previous example.
-
+![Waterfall Logo](http://apneadiving.github.io/images/waterfall_full_example.png)
 
 #### Rationale
 Coding is all about writing a flow of commands.
