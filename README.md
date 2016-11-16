@@ -71,15 +71,6 @@ Each waterfall has its own `outflow` and `error_pool`.
 
 `outflow` is an Openstruct so you can get/set its property like a hash or like a standard object.
 
-For the `error_pool`, its up to you. But using Rails, I usually `include ActiveModel::Validations` in my services.
-
-Thus you:
-
-* have a standard way to deal with errors
-* can deal with multiple errors
-* support I18n out of the box
-* can use your model errors out of the box
-
 ### Wiki
 Wiki contains many details, please check appropriate pages:
 
@@ -163,6 +154,16 @@ self
 
 Tips
 =========
+### Error pool
+For the error_pool, its up to you. But using Rails, I usually include ActiveModel::Validations in my services.
+
+Thus you:
+
+- have a standard way to deal with errors
+- can deal with multiple errors
+- support I18n out of the box
+- can use your model errors out of the box
+
 ### Conditional Flow
 In a service, there is one and single flow, so if you need conditionals to branch off, you can do:
 ```ruby
