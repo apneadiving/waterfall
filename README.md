@@ -65,27 +65,6 @@ then `bundle` as usual.
 
 ## Waterfall mixin
 
-### Overview
-
-The following are equivalent:
-```ruby
-# 1
-Wf.new.chain{ 1 + 1 }
-
-# 2
-class MyService
-  include Waterfall
-
-  def call
-    self.chain{ 1 + 1 }
-  end
-end
-
-MyService.new.call
-```
-
-This illustrates one convention classes including the mixin should obey: respond to `call`
-
 ### Outputs
 
 Each waterfall has its own `outflow` and `error_pool`.
