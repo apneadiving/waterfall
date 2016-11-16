@@ -6,7 +6,7 @@
 
 Be able to chain ruby commands, and treat them like a flow.
 
-It thus provides a new approach to flow control.
+It provides a new approach to flow control.
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
