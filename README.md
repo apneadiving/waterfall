@@ -8,47 +8,50 @@ Be able to chain ruby commands, and treat them like a flow.
 
 It thus provides a new approach to flow control.
 
+When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
+
 General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-lego).
 
-Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails) for a refactoring example.
-
-
-#### Basic example
+#### Example
 
 ```ruby
-class AuthenticateUser
+class FetchUser
   include Waterfall
-  include ActiveModel::Validations
 
-  validates :user, presence: true
-
-  def initialize(email, password)
-    @email, @password = email, password
+  def initialize(user_id)
+    @user_id = user_id
   end
 
   def call
-    self
-      .chain { @user = User.authenticate(@email, @password) }
-      .when_falsy { valid? }
-         .dam { errors }
-      .chain(:user) { user }
+    response = HTTParty.get("https://jsonplaceholder.typicode.com/users/#{@user_id}")
+    when_falsy { response.success? }
+      .dam { "Error status #{response.code}" }
+    chain(:user) { response.body }
   end
-
-  private
-
-  attr_reader :user
 end
 ```
-and call it anywhere:
+
+and call / chain:
 
 ```ruby
 Wf.new
-  .chain(current_user: :user) { AuthenticateUser.new(params[:email], params[:password]) }
-  .chain  { |outflow| render json: outflow.current_user }
-  .on_dam { |errors|  render json: { errors: errors.full_messages }, status: 422 }
+  .chain(user1: :user) { FetchUser.new(1) }
+  .chain(user2: :user) { FetchUser.new(2) }
+  .chain  {|outflow| puts(outflow.user1, outflow.user2)  } # report success
+  .on_dam {|error|   puts(error)      }                    # report error
 ```
 
-When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
+#### Overview
+
+A waterfall object has its own flow of commands, you can chain your commands and if something wrong happens, you dam the flow which bypasses the rest of the commands.
+
+Here is a basic representation:
+- green, the flow goes on `chain` by `chain`
+- red its bypassed and only `on_dam` blocks are executed.
+
+
+Here is one illustration of our previous example.
+
 
 #### Rationale
 Coding is all about writing a flow of commands.
@@ -62,9 +65,6 @@ One way to solve it is to create abstractions to wrap your business logic (servi
 * how to handle errors?
 * how to call a service within a service?
 * how to chain services / commands
-
-Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails).
-
 
 ## Wf object
 
@@ -81,7 +81,7 @@ The point is to be able to be able to chain an expected set of actions whenever 
 For installation, in your gemfile:
 
     gem 'waterfall'
-    
+
 then `bundle` as usual.
 
 ## Waterfall mixin
@@ -345,7 +345,7 @@ Here is my usual setup:
 ```ruby
 module Waterfall
   extend ActiveSupport::Concern
-  
+
   class Rollback < StandardError; end
 
   def with_transaction(&block)
@@ -375,7 +375,7 @@ class AuthenticateUser
   end
 
   def call
-    with_transaction do 
+    with_transaction do
       self
         .chain { @user = User.authenticate(@email, @password) }
         .when_falsy { valid? }
