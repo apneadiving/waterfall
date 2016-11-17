@@ -17,7 +17,7 @@ General presentation slides can [be found here](https://slides.com/apneadiving/c
 A waterfall object has its own flow of commands, you can chain your commands and if something wrong happens, you dam the flow which bypasses the rest of the commands.
 
 Here is a basic representation:
-- green, the flow goes on `chain` by `chain`
+- green, the flow goes on, `chain` by `chain`
 - red its bypassed and only `on_dam` blocks are executed.
 
 ![Waterfall Logo](http://apneadiving.github.io/images/waterfall_principle.png)
