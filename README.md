@@ -6,106 +6,64 @@
 
 Be able to chain ruby commands, and treat them like a flow.
 
-It thus provides a new approach to flow control.
-
-General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-lego).
-
-Check [the slides here](https://slides.com/apneadiving/handling-error-in-ruby-rails) for a refactoring example.
-
-
-#### Basic example
-
-```ruby
-class AuthenticateUser
-  include Waterfall
-  include ActiveModel::Validations
-
-  validates :user, presence: true
-
-  def initialize(email, password)
-    @email, @password = email, password
-  end
-
-  def call
-    self
-      .chain { @user = User.authenticate(@email, @password) }
-      .when_falsy { valid? }
-         .dam { errors }
-      .chain(:user) { user }
-  end
-
-  private
-
-  attr_reader :user
-end
-```
-and call it anywhere:
-
-```ruby
-Wf.new
-  .chain(current_user: :user) { AuthenticateUser.new(params[:email], params[:password]) }
-  .chain  { |outflow| render json: outflow.current_user }
-  .on_dam { |errors|  render json: { errors: errors.full_messages }, status: 422 }
-```
+It provides a new approach to flow control.
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
-#### Rationale
-Coding is all about writing a flow of commands.
+General presentation slides can [be found here](https://slides.com/apneadiving/code-ruby-like-you-build-lego).
 
-Generally you basically go on, unless something wrong happens. Whenever this happens you have to halt the flow and send feedback to the user.
+#### Overview
 
-When conditions stack up, readability decreases.
+A waterfall object has its own flow of commands, you can chain your commands and if something wrong happens, you dam the flow which bypasses the rest of the commands.
 
-One way to solve it is to create abstractions to wrap your business logic (service objects or the like). There some questions arise:
-* what should a good service return?
-* how to handle errors?
-* how to call a service within a service?
-* how to chain services / commands
+Here is a basic representation:
+- green, the flow goes on `chain` by `chain`
+- red its bypassed and only `on_dam` blocks are executed.
 
-Those topics are discussed in [the slides here](https://slides.com/apneadiving/service-objects-waterfall-rails).
+![Waterfall Logo](http://apneadiving.github.io/images/waterfall_principle.png)
 
+#### Example
 
-## Wf object
+```ruby
+class FetchUser
+  include Waterfall
 
-The `Wf` class just includes the `Waterfall` module. It makes it easy to create standalone waterfalls mostly to chain actions or to chain services including `Waterfall` or returning a `Wf` object.
+  def initialize(user_id)
+    @user_id = user_id
+  end
 
-Basically `chain` statements are executed in the order they appear. But if ever the waterfall is dammed, they are skipped.
+  def call
+    response = HTTParty.get("https://jsonplaceholder.typicode.com/users/#{@user_id}")
+    when_falsy { response.success? }
+      .dam { "Error status #{response.code}" }
+    chain(:user) { response.body }
+  end
+end
+```
 
-If a main waterfall chains another waterfall and the child waterfall is dammed, the main waterfall would be dammed.
+and call / chain:
 
-The point is to be able to be able to chain an expected set of actions whenever everything works fine. And to be able to quickly stop and get the errors back whenever something wrong happens.
+```ruby
+Wf.new
+  .chain(user1: :user) { FetchUser.new(1) }
+  .chain(user2: :user) { FetchUser.new(2) }
+  .chain  {|outflow| puts(outflow.user1, outflow.user2)  } # report success
+  .on_dam {|error|   puts(error)      }                    # report error
+```
+
+Which works like:
+
+![Waterfall Logo](http://apneadiving.github.io/images/waterfall_full_example.png)
 
 ## Installation
 
 For installation, in your gemfile:
 
     gem 'waterfall'
-    
+
 then `bundle` as usual.
 
 ## Waterfall mixin
-
-### Overview
-
-The following are equivalent:
-```ruby
-# 1
-Wf.new.chain{ 1 + 1 }
-
-# 2
-class MyService
-  include Waterfall
-
-  def call
-    self.chain{ 1 + 1 }
-  end
-end
-
-MyService.new.call
-```
-
-This illustrates one convention classes including the mixin should obey: respond to `call`
 
 ### Outputs
 
@@ -113,14 +71,13 @@ Each waterfall has its own `outflow` and `error_pool`.
 
 `outflow` is an Openstruct so you can get/set its property like a hash or like a standard object.
 
-For the `error_pool`, its up to you. But using Rails, I usually `include ActiveModel::Validations` in my services.
+### Wiki
+Wiki contains many details, please check appropriate pages:
 
-Thus you:
+- [Predicates](https://github.com/apneadiving/waterfall/wiki/Predicates)
+- [Wf Object](https://github.com/apneadiving/waterfall/wiki/Wf-object)
+- [Testing](https://github.com/apneadiving/waterfall/wiki/Testing)
 
-* have a standard way to deal with errors
-* can deal with multiple errors
-* support I18n out of the box
-* can use your model errors out of the box
 
 ## Illustration of chaining
 Doing
@@ -147,80 +104,6 @@ is the same as doing:
 
 Hopefully you better get the chaining power this way.
 
-## Predicates
-
-### chain(name_or_mapping = nil, &block) | block signature: (outflow, waterfall)
-
-Chain is the main predicate, what it does depends on what the block returns
-```ruby
- # main waterfall
- Wf.new
-   .chain(foo: :bar) do
-     # child waterfall
-     Wf.new.chain(:bar){ 1 }.chain(:baz){ 2 }.chain{ 3 }
-   end
-```
-##### when block doesn't return a waterfall
-
-The child waterfall would have the following outflow: `{ bar: 1, baz: 2 }`
-
-This illustrates that when the block returns a value which is not a waterfall, it stores the returned value of the block inside the `name_or_mapping` key of the `outflow` or doesn't store it if `name_or_mapping` is `nil`.
-
-Be aware those are equivalent:
-
-```ruby
-Wf.new.chain(:foo) { 1 }
-Wf.new.chain{|outflow| outflow[:foo] = 1 }
-Wf.new.chain{|outflow| outflow.foo = 1 }
-Wf.new.chain{|outflow, waterfall| waterfall.update_outflow(:foo, 1) }
-Wf.new.chain{|outflow, waterfall| waterfall.outflow.foo = 1 }
-```
-##### when block returns a waterfall
-
-The main waterfall would have the following outflow: `{ foo: 1 }`
-
-The main waterfall above receives the child waterfall as a return value of its `chain` block.
-All waterfalls have independent outflows.
-
-If `name_or_mapping` is `nil`, the main waterfall's `outflow` wouldnt be affected by its child (but if the child is dammed, the parent will be dammed).
-
-If `name_or_mapping` is a `hash`, the format must be read as `{ name_in_parent_waterfall: :name_from_child_waterfall}`. In the above example, the child returned an `outflow` with a `bar` key which has be renamed as `foo` in the main one.
-
-It may look useless, because most of the time you may not rename, but... It makes things clear. You know exactly what you expect and you know exactly that you dont expect the rest the child may provide.
-
-### when_falsy(&block) | block signature: (error_pool, waterfall)
-
-This predicate must ***always*** be used followed with `dam` like:
-
-```ruby
-Wf.new
-  .chain(:foo) { 1 }
-  .when_falsy { true }
-   .dam { "this wouldnt be executed"  }
-  .when_falsy { false }
-   .dam { "errrrr"  }
-  .chain(:bar) { 2 }
-  .on_dam {|error_pool| puts error_pool  }
-```
-
-If the block returns a falsy value, it executes the `dam` block, which will store the returned value in the `error_pool`.
-
-Once the waterfall is dammed, all following `chain` blocks are skipped (wont be executed). And all the following `on_dam` block would be executed.
-
-As a result the example above would return a waterfall object having its `outflow` equal to `{ foo: 1 }`. Remember: it has been dammed before `bar` would have been set.
-
-Its `error_pool` would be `"errrrr"` and it would be `puts` as a result of the `on_dam`
-
-Be aware those are equivalent:
-
-```ruby
-Wf.new.when_falsy{ false }.dam{ 'errrr' }
-Wf.new.chain{ |outflow, waterfall| waterfall.dam('errrr') unless false }
-```
-
-### when_truthy(&block) | block signature: (error_pool, waterfall)
-
-Behaves the same as `when_falsy` except it dams when its return value is truthy
 
 ## Syntactic sugar
 Given:
@@ -245,63 +128,7 @@ Wf.new
 ```
 Both are the same: if a block returns a waterfall which was not executed, it will execute it (hence the `call` convention)
 
-### on_dam(&block) | block signature: (error_pool, outflow, waterfall)
 
-Its block is executed whenever the waterfall is dammed, skipped otherwise.
-
-```ruby
-Wf.new
-  .when_falsy { false }
-  .on_dam {|error_pool, outflow, waterfall| puts error_pool  }
-```
-
-## Error propagation
-
-Whenever a a waterfall is dammed, all the following chains are skipped.
-
-* all the following chains are skipped
-* all `on_dam` blocks are executed
-
-## Testing a Waterfall service
-
-You could spec `AuthenticateUser` this way:
-```ruby
-describe AuthenticateUser do
-  let(:email)    { 'email@email.com' }
-  let(:password) { 'password' }
-  subject(:service) { AuthenticateUser.new(email, password).call }
-
-  context "when given valid credentials" do
-    let(:user) { double(:user) }
-
-    before do
-      allow(User).to receive(:authenticate).with(email, password).and_return(user)
-    end
-
-    it "succeeds" do
-      expect(service.dammed?).to be false
-    end
-
-    it "provides the user" do
-      expect(service.outflow.user).to eq(user)
-    end
-  end
-
-  context "when given invalid credentials" do
-    before do
-      allow(User).to receive(:authenticate).with(email, password).and_return(nil)
-    end
-
-    it "fails" do
-      expect(service.dammed?).to be true
-    end
-
-    it "provides a failure message" do
-      expect(service.error_pool).to be_present
-    end
-  end
-end
-```
 Syntax advice
 =========
 ```ruby
@@ -327,6 +154,16 @@ self
 
 Tips
 =========
+### Error pool
+For the error_pool, its up to you. But using Rails, I usually include ActiveModel::Validations in my services.
+
+Thus you:
+
+- have a standard way to deal with errors
+- can deal with multiple errors
+- support I18n out of the box
+- can use your model errors out of the box
+
 ### Conditional Flow
 In a service, there is one and single flow, so if you need conditionals to branch off, you can do:
 ```ruby
@@ -345,7 +182,7 @@ Here is my usual setup:
 ```ruby
 module Waterfall
   extend ActiveSupport::Concern
-  
+
   class Rollback < StandardError; end
 
   def with_transaction(&block)
@@ -375,21 +212,23 @@ class AuthenticateUser
   end
 
   def call
-    with_transaction do 
-      self
-        .chain { @user = User.authenticate(@email, @password) }
-        .when_falsy { valid? }
-          .dam { errors }
-        .chain(:user) { user }
+    with_transaction do
+      chain { @user = User.authenticate(@email, @password) }
+      when_falsy { valid? }
+        .dam { errors }
+      chain(:user) { user }
     end
   end
 end
 ```
 The huge benefit is that if you call services from services, everything will be rolled back.
 
-Examples
-=========
-Check the [wiki for other examples](https://github.com/apneadiving/waterfall/wiki).
+Examples / Presentations
+========================
+- Check the [wiki for other examples](https://github.com/apneadiving/waterfall/wiki/Refactoring-examples).
+- [Structure and chain your POROs](http://slides.com/apneadiving/structure-and-chain-your-poros).
+- [Service objects implementations](https://slides.com/apneadiving/service-objects-waterfall-rails).
+- [Handling error in Rails](https://slides.com/apneadiving/handling-error-in-ruby-rails).
 
 Thanks
 =========
