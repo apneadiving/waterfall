@@ -232,4 +232,4 @@ Examples / Presentations
 
 Thanks
 =========
-Huge thanks to [laxrph10](https://github.com/laxrph10) for the help during infinite naming brainstorming.
+Huge thanks to [robhorrigan](https://github.com/robhorrigan) for the help during infinite naming brainstorming.
