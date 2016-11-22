@@ -194,4 +194,16 @@ describe 'Wf' do
       expect(@error).to eq FailingChain.error
     end
   end
+
+  describe "undam" do
+    it "flow goes back to green path" do
+      wf
+        .chain  { wf.dam('err') }
+        .on_dam { wf.undam }
+        .chain  { @foo = 1 }
+        .on_dam { raise('shouldnt happen') }
+
+      expect(@foo).to eq 1
+    end
+  end
 end
