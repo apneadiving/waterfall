@@ -1,19 +1,11 @@
+require_relative 'when_truthy'
+
 module Waterfall
-  class WhenFalsy < Base
+  class WhenFalsy < WhenTruthy
 
-    def initialize(root)
-      @root = root
+    def dammed?
+      !super
     end
 
-    def call
-      @output = yield(*yield_args)
-    end
-
-    def dam
-      if !@root.dammed? && !@output
-        @root.dam yield(*yield_args)
-      end
-      @root
-    end
   end
 end
