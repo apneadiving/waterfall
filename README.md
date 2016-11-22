@@ -22,8 +22,6 @@ Here is a basic representation:
 
 ![Waterfall Logo](http://apneadiving.github.io/images/waterfall_principle.png)
 
-Done in a mere 222 LOC.
-
 #### Example
 
 ```ruby
