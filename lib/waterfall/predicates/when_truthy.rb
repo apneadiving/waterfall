@@ -10,14 +10,14 @@ module Waterfall
     end
 
     def dam
-      if dammed?
+      if !@root.dammed? && condition?
         @root.dam yield(*yield_args)
       end
       @root
     end
 
-    def dammed?
-      !@root.dammed? && @output
+    def condition?
+      @output
     end
   end
 end

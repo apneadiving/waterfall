@@ -128,7 +128,8 @@ describe 'Wf' do
       it "when actually falsy" do
         expect(my_proc).to_not receive(:call)
         action false
-      end
+        expect(@error).to eq 'dammed'
+     end
     end
   end
 
@@ -166,6 +167,7 @@ describe 'Wf' do
       it "when actually truthy" do
         expect(my_proc).to_not receive(:call)
         action true
+        expect(@error).to eq 'dammed'
       end
     end
   end
