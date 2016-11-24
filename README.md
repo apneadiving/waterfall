@@ -33,10 +33,10 @@ class FetchUser
   end
 
   def call
-    response = HTTParty.get("https://jsonplaceholder.typicode.com/users/#{@user_id}")
-    when_falsy { response.success? }
-      .dam { "Error status #{response.code}" }
-    chain(:user) { response.body }
+    chain { @response = HTTParty.get("https://jsonplaceholder.typicode.com/users/#{@user_id}") }
+    when_falsy { @response.success? }
+      .dam { "Error status #{@response.code}" }
+    chain(:user) { @response.body }
   end
 end
 ```
