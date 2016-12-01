@@ -7,33 +7,48 @@ describe 'Wf' do
 
     it "yields wf outflow" do
       wf
-        .chain  {|outflow| outflow[:bar] = 'bar' }
-        .chain  {|outflow| @bar = outflow[:bar] }
-      expect(wf.outflow[:bar]).to eq 'bar'
+        .chain  {|outflow| outflow.bar = 'bar' }
+        .chain  {|outflow| @bar = outflow.bar }
+
+      expect(wf.outflow.bar).to eq 'bar'
       expect(@bar).to eq 'bar'
     end
 
     it "assigns outflow's key the value of the block" do
       wf
         .chain(:bar) { 'bar' }
-      expect(wf.outflow[:bar]).to eq 'bar'
+      expect(wf.outflow.bar).to eq 'bar'
     end
 
     context "wf internals" do
       it "dam from within" do
         wf
           .chain  {|outflow, waterfall| waterfall.dam('errrrr') }
-          .on_dam {|error_pool| @errors = error_pool }
 
         expect(wf.dammed?).to be true
-        expect(@errors).to eq 'errrrr'
+        expect(wf.error_pool).to eq 'errrrr'
+      end
+
+      it "expose child waterfall outflow even if dammed (or at least what was computed)" do
+        wf
+          .chain(bar: :bar, baz: :baz) do
+            Wf.new
+              .chain(:bar) { 'bar' }
+              .dam('boom')
+              .chain(:baz) { 'baz' }
+          end
+
+        expect(wf.dammed?).to be true
+        expect(wf.error_pool).to eq 'boom'
+        expect(wf.outflow.bar).to eq 'bar'
+        expect(wf.outflow.baz).to eq nil
       end
 
       it "outflow from within" do
         wf
-          .chain {|outflow, waterfall| waterfall.outflow[:foo] = 1 }
+          .chain {|outflow, waterfall| waterfall.outflow.foo = 1 }
 
-        expect(wf.outflow[:foo]).to eq 1
+        expect(wf.outflow.foo).to eq 1
       end
     end
 
@@ -47,7 +62,7 @@ describe 'Wf' do
 
             expect(wf.outflow.foo).to be nil
             expect(wf.outflow.bar).to be nil
-            expect(wf.outflow[:baz]).to eq waterfall.outflow[:foo]
+            expect(wf.outflow.baz).to eq waterfall.outflow.foo
           end
         end
       end
@@ -103,7 +118,6 @@ describe 'Wf' do
         .when_falsy { my_proc.call(bool) }
           .dam  { 'err' }
         .chain  { @foo = 1 }
-        .on_dam { |error_pool| @error = error_pool }
     end
 
     context "main context not dammed" do
@@ -111,13 +125,13 @@ describe 'Wf' do
 
       it "when actually falsy" do
         action false
-        expect(@error).to eq 'err'
+        expect(wf.error_pool).to eq 'err'
         expect(@foo).to_not eq 1
       end
 
       it "when actually truthy" do
         action true
-        expect(@error).to_not eq 'err'
+        expect(wf.error_pool).to_not eq 'err'
         expect(@foo).to eq 1
       end
     end
@@ -128,7 +142,7 @@ describe 'Wf' do
       it "when actually falsy" do
         expect(my_proc).to_not receive(:call)
         action false
-        expect(@error).to eq 'dammed'
+        expect(wf.error_pool).to eq 'dammed'
      end
     end
   end
@@ -142,7 +156,6 @@ describe 'Wf' do
         .when_truthy { my_proc.call(bool) }
           .dam  { 'err' }
         .chain  { @foo = 1 }
-        .on_dam { |error_pool| @error = error_pool }
     end
 
     context "main context not dammed" do
@@ -150,13 +163,13 @@ describe 'Wf' do
 
       it "when actually falsy" do
         action false
-        expect(@error).to_not eq 'err'
+        expect(wf.error_pool).to_not eq 'err'
         expect(@foo).to eq 1
       end
 
       it "when actually truthy" do
         action true
-        expect(@error).to eq 'err'
+        expect(wf.error_pool).to eq 'err'
         expect(@foo).to_not eq 1
       end
     end
@@ -167,7 +180,7 @@ describe 'Wf' do
       it "when actually truthy" do
         expect(my_proc).to_not receive(:call)
         action true
-        expect(@error).to eq 'dammed'
+        expect(wf.error_pool).to eq 'dammed'
       end
     end
   end
@@ -190,10 +203,9 @@ describe 'Wf' do
       wf
         .chain { FailingChain.new }
         .chain    { @foo = 1 }
-        .on_dam   { |error_pool| @error = error_pool }
 
       expect(@foo).to_not eq 1
-      expect(@error).to eq FailingChain.error
+      expect(wf.error_pool).to eq FailingChain.error
     end
   end
 
