@@ -10,7 +10,7 @@ It provides a new approach to flow control.
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
-General presentation article is there: [CHAIN services like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab).
+General presentation article is there: [Chain services like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab).
 
 #### Overview
 
