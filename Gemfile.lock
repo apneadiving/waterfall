@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    waterfall (1.0.2)
+    waterfall (1.0.3)
 
 GEM
   remote: https://rubygems.org/
@@ -51,3 +51,6 @@ DEPENDENCIES
   rake
   rspec (= 3.2)
   waterfall!
+
+BUNDLED WITH
+   1.13.4
