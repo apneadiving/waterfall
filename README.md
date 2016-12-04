@@ -4,9 +4,7 @@
 [![Build Status](https://travis-ci.org/apneadiving/waterfall.svg?branch=master)](https://travis-ci.org/apneadiving/waterfall)
 #### Goal
 
-Be able to chain ruby commands, and treat them like a flow.
-
-It provides a new approach to flow control.
+Chain ruby commands, and treat them like a flow, which provides a new approach to application control flow.
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
