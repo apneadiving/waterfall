@@ -2,6 +2,7 @@
 [![Code Climate](https://codeclimate.com/github/apneadiving/waterfall/badges/gpa.svg)](https://codeclimate.com/github/apneadiving/waterfall)
 [![Test Coverage](https://codeclimate.com/github/apneadiving/waterfall/badges/coverage.svg)](https://codeclimate.com/github/apneadiving/waterfall/coverage)
 [![Build Status](https://travis-ci.org/apneadiving/waterfall.svg?branch=master)](https://travis-ci.org/apneadiving/waterfall)
+[![Gem Version](https://badge.fury.io/rb/waterfall.svg)](https://badge.fury.io/rb/waterfall)
 #### Goal
 
 Chain ruby commands, and treat them like a flow, which provides a new approach to application control flow.
