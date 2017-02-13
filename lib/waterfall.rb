@@ -10,6 +10,9 @@ module Waterfall
 
   attr_reader :error_pool, :outflow, :flowing, :_wf_rolled_back
 
+  class IncorrectDamArgumentError      < StandardError; end
+  class IncorrectChainingArgumentError < StandardError; end
+
   def when_falsy(&block)
     handler = ::Waterfall::WhenFalsy.new(self)
     _wf_run { handler.call(&block) }
@@ -31,6 +34,7 @@ module Waterfall
   end
 
   def chain_wf(mapping_hash = nil, &block)
+    warn "[DEPRECATION] `chain_wf` is deprecated.  Please use `chain` instead."
     chain(mapping_hash, &block)
   end
 
@@ -42,12 +46,13 @@ module Waterfall
   end
 
   def dam(obj)
+    raise IncorrectDamArgumentError.new("You cant dam with a falsy object") unless obj
     @error_pool = obj
     self
   end
 
   def undam
-    dam nil
+    @error_pool = nil
     self
   end
 

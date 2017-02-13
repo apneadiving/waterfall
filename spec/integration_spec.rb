@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe 'Wf' do
   let(:wf) { Wf.new }
+  let(:error_string) { 'error' }
 
   describe "chain" do
 
@@ -23,10 +24,10 @@ describe 'Wf' do
     context "wf internals" do
       it "dam from within" do
         wf
-          .chain  {|outflow, waterfall| waterfall.dam('errrrr') }
+          .chain  {|outflow, waterfall| waterfall.dam(error_string) }
 
         expect(wf.dammed?).to be true
-        expect(wf.error_pool).to eq 'errrrr'
+        expect(wf.error_pool).to eq error_string
       end
 
       it "expose child waterfall outflow even if dammed (or at least what was computed)" do
@@ -55,14 +56,18 @@ describe 'Wf' do
     describe "chaining waterfalls" do
 
       shared_examples "a waterfall chain" do
-        describe 'chain_wf' do
+        describe 'chain waterfall' do
           it "takes expected vars only and rename them" do
             wf
-              .chain_wf(baz: :foo) { waterfall }
+              .chain(baz: :foo) { waterfall }
 
             expect(wf.outflow.foo).to be nil
             expect(wf.outflow.bar).to be nil
             expect(wf.outflow.baz).to eq waterfall.outflow.foo
+          end
+
+          it 'raises if chain waterfall without hash mapping' do
+            expect { wf.chain(:foo) { waterfall } }.to raise_error(Waterfall::IncorrectChainingArgumentError)
           end
         end
       end
@@ -116,7 +121,7 @@ describe 'Wf' do
       wf
         .chain { wf.dam('dammed') if dam? }
         .when_falsy { my_proc.call(bool) }
-          .dam  { 'err' }
+          .dam  { error_string }
         .chain  { @foo = 1 }
     end
 
@@ -125,13 +130,13 @@ describe 'Wf' do
 
       it "when actually falsy" do
         action false
-        expect(wf.error_pool).to eq 'err'
+        expect(wf.error_pool).to eq error_string
         expect(@foo).to_not eq 1
       end
 
       it "when actually truthy" do
         action true
-        expect(wf.error_pool).to_not eq 'err'
+        expect(wf.error_pool).to_not eq error_string
         expect(@foo).to eq 1
       end
     end
@@ -154,7 +159,7 @@ describe 'Wf' do
       wf
         .chain { wf.dam('dammed') if dam? }
         .when_truthy { my_proc.call(bool) }
-          .dam  { 'err' }
+          .dam  { error_string }
         .chain  { @foo = 1 }
     end
 
@@ -163,13 +168,13 @@ describe 'Wf' do
 
       it "when actually falsy" do
         action false
-        expect(wf.error_pool).to_not eq 'err'
+        expect(wf.error_pool).to_not eq error_string
         expect(@foo).to eq 1
       end
 
       it "when actually truthy" do
         action true
-        expect(wf.error_pool).to eq 'err'
+        expect(wf.error_pool).to eq error_string
         expect(@foo).to_not eq 1
       end
     end
@@ -195,24 +200,36 @@ describe 'Wf' do
       end
 
       def self.error
-        'err'
+        'error'
       end
     end
 
     it "error propagates" do
       wf
         .chain { FailingChain.new }
-        .chain    { @foo = 1 }
+        .chain { @foo = 1 }
 
       expect(@foo).to_not eq 1
       expect(wf.error_pool).to eq FailingChain.error
     end
   end
 
+  describe "dam" do
+    it "raises if falsy argument sent" do
+      expect { wf.dam(nil) }.to raise_error(Waterfall::IncorrectDamArgumentError)
+    end
+
+    it "dams with truthy argument" do
+      wf.dam(error_string)
+      expect(wf.error_pool).to eq error_string
+      expect(wf.dammed?).to be true
+    end
+  end
+
   describe "undam" do
     it "flow goes back to green path" do
       wf
-        .chain  { wf.dam('err') }
+        .chain  { wf.dam(error_string) }
         .on_dam { wf.undam }
         .chain  { @foo = 1 }
         .on_dam { raise('shouldnt happen') }
