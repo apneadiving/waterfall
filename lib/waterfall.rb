@@ -8,21 +8,21 @@ require 'waterfall/predicates/chain'
 
 module Waterfall
 
-  attr_reader :error_pool, :outflow, :flowing, :_wf_rolled_back
+  attr_reader :error_pool, :outflow
 
   class IncorrectDamArgumentError      < StandardError; end
   class IncorrectChainingArgumentError < StandardError; end
 
   def when_falsy(&block)
-    handler = ::Waterfall::WhenFalsy.new(self)
-    _wf_run { handler.call(&block) }
-    handler
+    ::Waterfall::WhenFalsy.new(self).tap do |handler|
+      _wf_run { handler.call(&block) }
+    end
   end
 
   def when_truthy(&block)
-    handler = ::Waterfall::WhenTruthy.new(self)
-    _wf_run { handler.call(&block) }
-    handler
+    ::Waterfall::WhenTruthy.new(self).tap do |handler|
+      _wf_run { handler.call(&block) }
+    end
   end
 
   def chain(mapping_or_var_name = nil, &block)
@@ -47,8 +47,7 @@ module Waterfall
 
   def dam(obj)
     raise IncorrectDamArgumentError.new("You cant dam with a falsy object") unless obj
-    @error_pool = obj
-    self
+    _wf_run { @error_pool = obj }
   end
 
   def undam
@@ -64,8 +63,8 @@ module Waterfall
     true
   end
 
-  def flowing?
-    !! @flowing
+  def has_flown?
+    !! @has_flown
   end
 
   def update_outflow(key, value)
@@ -74,17 +73,16 @@ module Waterfall
   end
 
   def _wf_run
-    @flowing = true
+    @has_flown = true
     @outflow ||= OpenStruct.new({})
     yield unless dammed?
     self
   end
-
 end
 
 class Wf
   include Waterfall
   def initialize
-    @outflow = OpenStruct.new({})
+    _wf_run {}
   end
 end

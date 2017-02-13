@@ -16,7 +16,7 @@ module Waterfall
     end
 
     def map_waterfalls(child_waterfall, mapping)
-      child_waterfall.call unless child_waterfall.flowing?
+      child_waterfall.call unless child_waterfall.has_flown?
 
       raise IncorrectChainingArgumentError.new(mapping_error_message) unless mapping.is_a?(Hash)
 
