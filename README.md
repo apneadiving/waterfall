@@ -77,6 +77,8 @@ Wiki contains many details, please check appropriate pages:
 - [Wf Object](https://github.com/apneadiving/waterfall/wiki/Wf-object)
 - [Testing](https://github.com/apneadiving/waterfall/wiki/Testing)
 
+### Koans (!)
+You can try and exercise your understanding of Waterfall using the [Koans here](https://github.com/apneadiving/waterfall_koans)
 
 ## Illustration of chaining
 Doing
