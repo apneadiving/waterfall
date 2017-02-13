@@ -41,6 +41,10 @@ describe Wf do
     expect(wf.error_pool).to eq 'error'
   end
 
+  it 'dam raises if falsy argument sent' do
+    expect { wf.dam(nil) }.to raise_error(Waterfall::IncorrectDamArgumentError)
+  end
+
   it 'can be undammed' do
     wf.dam('error').undam
     expect(wf.dammed?).to be false
@@ -84,5 +88,14 @@ describe Wf do
       expect(outflow).to eq wf.outflow
       expect(waterfall).to eq wf
     end
+  end
+
+  it 'raises if chain waterfall without hash mapping' do
+    expect { wf.chain(:foo) { Wf.new } }.to raise_error(Waterfall::IncorrectChainingArgumentError, Waterfall::Chain::MAPPING_ERROR_MESSAGE)
+  end
+
+  it 'warns against chain_wf' do
+    expect(wf).to receive :warn
+    wf.chain_wf { Wf.new }
   end
 end

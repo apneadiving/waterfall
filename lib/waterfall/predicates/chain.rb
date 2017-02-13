@@ -18,7 +18,7 @@ module Waterfall
     def map_waterfalls(child_waterfall, mapping)
       child_waterfall.call unless child_waterfall.has_flown?
 
-      raise IncorrectChainingArgumentError.new(mapping_error_message) unless mapping.is_a?(Hash)
+      raise IncorrectChainingArgumentError.new(MAPPING_ERROR_MESSAGE) unless mapping.is_a?(Hash)
 
       mapping.each do |k, v|
         @root.update_outflow(k, child_waterfall.outflow[v])
@@ -31,8 +31,6 @@ module Waterfall
       self
     end
 
-    def mapping_error_message
-      "When chaining waterfalls, you must pass a mapping hash to pass data from one to the other"
-    end
+    MAPPING_ERROR_MESSAGE = "When chaining waterfalls, you must pass a mapping hash to pass data from one to the other"
   end
 end
