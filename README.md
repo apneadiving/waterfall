@@ -187,7 +187,7 @@ module Waterfall
   class Rollback < StandardError; end
 
   def with_transaction(&block)
-    ActiveRecord::Base.transaction(requires_new: true) do
+    ActiveRecord::Base.transaction do
       yield
       on_dam do
         raise Waterfall::Rollback
