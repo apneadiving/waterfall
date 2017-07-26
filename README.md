@@ -9,7 +9,7 @@ Chain ruby commands, and treat them like a flow, which provides a new approach t
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
-General presentation blog post there: [Chain services objects like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab).
+General presentation blog post there: [Chain services objects like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab) and upcoming book: [the Unhappy path](https://leanpub.com/the-unhappy-path)
 
 #### Overview
 
