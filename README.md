@@ -209,7 +209,7 @@ class AuthenticateUser
   attr_reader :user
 
   def initialize(email, password)
-    @email, @password = email, @password
+    @email, @password = email, password
   end
 
   def call
