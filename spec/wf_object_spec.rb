@@ -1,7 +1,11 @@
 require 'spec_helper'
 
-describe Wf do
-  let(:wf) { Wf.new }
+describe Flow do
+  let(:wf) { Flow.new }
+
+  it 'is aliased' do
+    expect(Flow).to eq Wf
+  end
 
   it 'is a waterfall' do
     expect(wf.is_waterfall?).to be true
@@ -91,11 +95,11 @@ describe Wf do
   end
 
   it 'raises if chain waterfall without hash mapping' do
-    expect { wf.chain(:foo) { Wf.new } }.to raise_error(Waterfall::IncorrectChainingArgumentError, Waterfall::Chain::MAPPING_ERROR_MESSAGE)
+    expect { wf.chain(:foo) { Flow.new } }.to raise_error(Waterfall::IncorrectChainingArgumentError, Waterfall::Chain::MAPPING_ERROR_MESSAGE)
   end
 
   it 'warns against chain_wf' do
     expect(wf).to receive :warn
-    wf.chain_wf { Wf.new }
+    wf.chain_wf { Flow.new }
   end
 end

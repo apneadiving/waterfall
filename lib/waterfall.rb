@@ -86,3 +86,5 @@ class Wf
     _wf_run {}
   end
 end
+
+Flow = Wf

@@ -43,11 +43,11 @@ end
 and call / chain:
 
 ```ruby
-Wf.new
-  .chain(user1: :user) { FetchUser.new(1) }
-  .chain(user2: :user) { FetchUser.new(2) }
-  .chain  {|outflow| puts(outflow.user1, outflow.user2)  } # report success
-  .on_dam {|error|   puts(error)      }                    # report error
+Flow.new
+    .chain(user1: :user) { FetchUser.new(1) }
+    .chain(user2: :user) { FetchUser.new(2) }
+    .chain  {|outflow| puts(outflow.user1, outflow.user2)  } # report success
+    .on_dam {|error|   puts(error)      }                    # report error
 ```
 
 Which works like:
@@ -81,24 +81,24 @@ Wiki contains many details, please check appropriate pages:
 ## Illustration of chaining
 Doing
 ```ruby
- Wf.new
-   .chain(foo: :bar) { Wf.new.chain(:bar){ 1 } }
+Flow.new
+    .chain(foo: :bar) { Flow.new.chain(:bar){ 1 } }
 ```
 
 is the same as doing:
 
 ```ruby
- Wf.new
-   .chain do |outflow, parent_waterfall|
-     unless parent_waterfall.dammed?
-       child = Wf.new.chain(:bar){ 1 }
-       if child.dammed?
-         parent_waterfall.dam(child.error_pool)
-       else
-         parent_waterfall.ouflow.foo = child.outflow.bar
-       end
-     end
-   end
+Flow.new
+    .chain do |outflow, parent_waterfall|
+      unless parent_waterfall.dammed?
+        child = Wf.new.chain(:bar){ 1 }
+        if child.dammed?
+          parent_waterfall.dam(child.error_pool)
+        else
+          parent_waterfall.ouflow.foo = child.outflow.bar
+        end
+      end
+    end
 ```
 
 Hopefully you better get the chaining power this way.
@@ -117,13 +117,13 @@ end
 You may have noticed that I usually write:
 
 ```ruby
-Wf.new
-  .chain { MyWaterfall.new }
+Flow.new
+    .chain { MyWaterfall.new }
 ```
 instead of
 ```ruby
-Wf.new
-  .chain { MyWaterfall.new.call }
+Flow.new
+    .chain { MyWaterfall.new.call }
 ```
 Both are the same: if a block returns a waterfall which was not executed, it will execute it (hence the `call` convention)
 

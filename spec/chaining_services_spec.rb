@@ -24,7 +24,7 @@ describe 'Chaining services' do
     end
   end
 
-  let(:wf) { Wf.new }
+  let(:wf) { Flow.new }
   let(:listener) { spy 'listener', is_waterfall?: false }
 
   it 'you dont need to call child waterfalls, just pass the instance' do
