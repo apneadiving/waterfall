@@ -9,7 +9,7 @@ Chain ruby commands, and treat them like a flow, which provides a new approach t
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
-General presentation blog post there: [Chain services objects like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab).
+General presentation blog post there: [Chain services objects like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab) and upcoming book: [the Unhappy path](https://leanpub.com/the-unhappy-path)
 
 #### Overview
 
@@ -77,6 +77,8 @@ Wiki contains many details, please check appropriate pages:
 - [Wf Object](https://github.com/apneadiving/waterfall/wiki/Wf-object)
 - [Testing](https://github.com/apneadiving/waterfall/wiki/Testing)
 
+### Koans (!)
+You can try and exercise your understanding of Waterfall using the [Koans here](https://github.com/apneadiving/waterfall_koans)
 
 ## Illustration of chaining
 Doing
@@ -207,7 +209,7 @@ class AuthenticateUser
   attr_reader :user
 
   def initialize(email, password)
-    @email, @password = email, @password
+    @email, @password = email, password
   end
 
   def call
