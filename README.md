@@ -224,6 +224,11 @@ end
 ```
 The huge benefit is that if you call services from services, everything will be rolled back.
 
+### FYI
+
+`Flow` is just an alias for the `Wf` class, so just use the one you prefer :)
+
+
 Examples / Presentations
 ========================
 - Check the [wiki for other examples](https://github.com/apneadiving/waterfall/wiki/Refactoring-examples).
