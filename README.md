@@ -10,7 +10,7 @@ When logic is complicated, waterfalls show their true power and let you write in
 
 #### Material
 <a href="https://leanpub.com/the-unhappy-path"> <img align="left" width="80" height="116" src="https://apneadiving.github.io/images/unhappy-path.png"> </a>
-Upcoming book about failure handling management, leveraging the gem: [The Unhappy path](https://leanpub.com/the-unhappy-path)
+Upcoming book about failure management patterns, leveraging the gem: [The Unhappy path](https://leanpub.com/the-unhappy-path)
 
 General presentation blog post there: [Chain services objects like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab).
 
