@@ -1,4 +1,3 @@
-![Waterfall Logo](https://apneadiving.github.io/images/waterfall_logo.png) [![the Unhappy path](https://apneadiving.github.io/images/unhappy-path-cover.png)](https://leanpub.com/the-unhappy-path)
 [![Code Climate](https://codeclimate.com/github/apneadiving/waterfall/badges/gpa.svg)](https://codeclimate.com/github/apneadiving/waterfall)
 [![Test Coverage](https://codeclimate.com/github/apneadiving/waterfall/badges/coverage.svg)](https://codeclimate.com/github/apneadiving/waterfall/coverage)
 [![Build Status](https://travis-ci.org/apneadiving/waterfall.svg?branch=master)](https://travis-ci.org/apneadiving/waterfall)
@@ -9,7 +8,13 @@ Chain ruby commands, and treat them like a flow, which provides a new approach t
 
 When logic is complicated, waterfalls show their true power and let you write intention revealing code. Above all they excel at chaining services.
 
+#### Material
+<a href="https://leanpub.com/the-unhappy-path"> <img align="left" width="80" height="116" src="https://apneadiving.github.io/images/unhappy-path.png"> </a>
+Upcoming book about failure handling management in Ruby, leveraging the gem.
+
 General presentation blog post there: [Chain services objects like a boss](https://medium.com/p/chain-service-objects-like-a-boss-35d0b83606ab).
+
+Reach me [@apneadiving](https://twitter.com/apneadiving)
 
 
 #### Overview
@@ -20,7 +25,7 @@ Here is a basic representation:
 - green, the flow goes on, `chain` by `chain`
 - red its bypassed and only `on_dam` blocks are executed.
 
-![Waterfall Logo](https://apneadiving.github.io/images/waterfall_principle.png)
+![Waterfall Principle](https://apneadiving.github.io/images/waterfall_principle.png)
 
 #### Example
 
@@ -228,7 +233,6 @@ The huge benefit is that if you call services from services, everything will be 
 ### FYI
 
 `Flow` is just an alias for the `Wf` class, so just use the one you prefer :)
-
 
 Examples / Presentations
 ========================
