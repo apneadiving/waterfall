@@ -33,11 +33,6 @@ module Waterfall
     end
   end
 
-  def chain_wf(mapping_hash = nil, &block)
-    warn "[DEPRECATION] `chain_wf` is deprecated.  Please use `chain` instead."
-    chain(mapping_hash, &block)
-  end
-
   def on_dam(&block)
     ::Waterfall::OnDam
       .new(self)
@@ -53,6 +48,10 @@ module Waterfall
   def undam
     @error_pool = nil
     self
+  end
+
+  def halt_chain(&block)
+    yield(outflow, error_pool)
   end
 
   def dammed?
