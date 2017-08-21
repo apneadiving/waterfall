@@ -1,3 +1,7 @@
+===1.1.0
+- Removed `chain_wf`.
+- Introduced `halt_chain`
+
 ===1.0.6
 Alias Wf with Flow
 
