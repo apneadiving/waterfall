@@ -182,6 +182,18 @@ else
   self.chain { Service3.new }
 end
 ```
+### Halting chain
+Sometimes you have a flow and you need a return value. You can use `halt_chain`, which is executed whether or not the flow is dammed. It returns what the block returns. As a consequence, it cannot be chained anymore, so it must be the last command:
+
+```ruby
+self.halt_chain do |outflow, error_pool|
+  if error_pool
+    # what you want to return on error
+  else
+    # what you want to return from the outflow
+  end
+end
+```
 
 ### Rails and transactions
 I'm used to wrap every single object involving database interactions within transactions, so it can be rolled back on error.

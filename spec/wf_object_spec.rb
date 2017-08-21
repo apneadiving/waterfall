@@ -27,6 +27,11 @@ describe Flow do
     expect(wf.outflow.foo).to eq 1
   end
 
+  it 'returns itself to enable chaining' do
+    expect(wf.chain{ }).to eq wf
+    expect(wf.on_dam{ }).to eq wf
+  end
+
   it 'chain yields outflow and waterfall itself' do
     wf.chain do |outflow, waterfall|
       expect(outflow).to eq wf.outflow
@@ -98,8 +103,24 @@ describe Flow do
     expect { wf.chain(:foo) { Flow.new } }.to raise_error(Waterfall::IncorrectChainingArgumentError, Waterfall::Chain::MAPPING_ERROR_MESSAGE)
   end
 
-  it 'warns against chain_wf' do
-    expect(wf).to receive :warn
-    wf.chain_wf { Flow.new }
+  describe 'halt_chain' do
+    it "yields expected values" do
+      wf.chain(:foo) { 1 }.halt_chain do |outflow, error_pool|
+        expect(outflow).to    eq wf.outflow
+        expect(error_pool).to eq wf.error_pool
+      end
+    end
+
+    it "yields expected values even if dammed" do
+      wf.chain(:foo) { 1 }.dam("errr").halt_chain do |outflow, error_pool|
+        expect(outflow).to    eq wf.outflow
+        expect(error_pool).to eq wf.error_pool
+      end
+    end
+
+    it "returns what the block returns" do
+      expect(wf.halt_chain { "return value" }).to eq "return value"
+    end
+
   end
 end
