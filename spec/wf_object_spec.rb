@@ -105,6 +105,13 @@ describe Flow do
 
   describe 'halt_chain' do
     it "yields expected values" do
+      wf.chain(:foo) { 1 }.halt_chain do |outflow, error_pool|
+        expect(outflow).to    eq wf.outflow
+        expect(error_pool).to eq wf.error_pool
+      end
+    end
+
+    it "yields expected values even if dammed" do
       wf.chain(:foo) { 1 }.dam("errr").halt_chain do |outflow, error_pool|
         expect(outflow).to    eq wf.outflow
         expect(error_pool).to eq wf.error_pool

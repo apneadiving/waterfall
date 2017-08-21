@@ -183,7 +183,7 @@ else
 end
 ```
 ### Halting chain
-Sometimes you have a flow and you need a return value. You can use `halt_chain` which would return what the block returns. As a consequence, it cannot be chained anymore, so it must be the last command:
+Sometimes you have a flow and you need a return value. You can use `halt_chain`, which is executed whether or not the flow is dammed. It returns what the block returns. As a consequence, it cannot be chained anymore, so it must be the last command:
 
 ```ruby
 self.halt_chain do |outflow, error_pool|
