@@ -42,7 +42,7 @@ module Waterfall
 
   def dam(obj)
     raise IncorrectDamArgumentError.new("You cant dam with a falsy object") unless obj
-    _wf_run { @error_pool = obj }
+    _wf_run { @error_pool = wrap_error_pool(obj) }
   end
 
   def undam
@@ -69,6 +69,11 @@ module Waterfall
   def update_outflow(key, value)
     @outflow[key] = value
     self
+  end
+
+  # this is a identity but opens door to be overriden
+  def wrap_error_pool(obj)
+    obj
   end
 
   def _wf_run
