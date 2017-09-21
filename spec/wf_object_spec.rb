@@ -121,6 +121,33 @@ describe Flow do
     it "returns what the block returns" do
       expect(wf.halt_chain { "return value" }).to eq "return value"
     end
+  end
 
+  describe 'wrap_error_pool' do
+    let(:error) { "Errrr" }
+
+    ThrowAwayStruct = Struct.new(:err)
+
+    let(:throw_away_patched_wf) do
+      Class.new do
+        include Waterfall
+
+        def wrap_error_pool(obj)
+          ThrowAwayStruct.new(obj)
+        end
+      end
+    end
+
+    it "does not wrap errors inside an object by default" do
+      wf.dam(error)
+      expect(wf.error_pool).to eq error
+    end
+
+    it "does wrap errors inside an object when told to" do
+      flow = throw_away_patched_wf.new
+      flow.dam(error)
+      expect(flow.error_pool).to     be_a ThrowAwayStruct
+      expect(flow.error_pool.err).to eq   error
+    end
   end
 end
