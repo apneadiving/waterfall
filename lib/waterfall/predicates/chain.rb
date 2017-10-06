@@ -10,6 +10,7 @@ module Waterfall
 
       if waterfall?(output)
         map_waterfalls(output, @mapping_or_var_name || {})
+        @root.send :_add_executed_flow, output
       else
         @root.update_outflow(@mapping_or_var_name, output) if @mapping_or_var_name
       end
