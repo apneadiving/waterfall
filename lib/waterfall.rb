@@ -74,8 +74,10 @@ module Waterfall
 
   protected
 
-  def _reverse_flows(current_error_spot)
-    reverse_flow unless current_error_spot
+  def _reverse_flows(skip_self)
+    return if @flow_reversed
+    @flow_reversed = true
+    reverse_flow unless skip_self
     (@_executed_flows || []).reverse_each do |f|
       f.send :_reverse_flows, false
     end

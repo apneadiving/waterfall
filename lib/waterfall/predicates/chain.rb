@@ -10,7 +10,6 @@ module Waterfall
 
       if waterfall?(output)
         map_waterfalls(output, @mapping_or_var_name || {})
-        @root.send :_add_executed_flow, output
       else
         @root.update_outflow(@mapping_or_var_name, output) if @mapping_or_var_name
       end
@@ -24,6 +23,8 @@ module Waterfall
       mapping.each do |k, v|
         @root.update_outflow(k, child_waterfall.outflow[v])
       end
+
+      @root.send :_add_executed_flow, child_waterfall
 
       if child_waterfall.dammed?
         @root.dam child_waterfall.error_pool

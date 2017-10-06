@@ -119,43 +119,52 @@ describe Flow do
 
   describe 'reverse_flow' do
     let(:parent_flow) { Flow.new }
-    let(:executed_sub_flow1) { Flow.new }
-    let(:executed_sub_flow2) { Flow.new }
-    let(:sub_flow3)          { Flow.new }
-    let(:executed_sub_sub_flow1) { Flow.new }
+    let(:sub_flow1)   { Flow.new }
+    let(:sub_flow2)   { Flow.new }
+    let(:sub_flow3)   { Flow.new }
+    let(:sub_sub_flow1) { Flow.new }
+    let(:sub_sub_flow2) { Flow.new }
+    let(:sub_sub_flow3) { Flow.new }
+    let(:sub_sub_sub_flow1) { Flow.new }
 
     def action
-      parent_flow.chain do
-        wf.chain do
-            executed_sub_flow1.chain { executed_sub_sub_flow1 }
-          end
-          .chain { executed_sub_flow2 }
-          .when_truthy { true }.dam { 'errr' }
-          .chain { sub_flow3 }
-      end
+      parent_flow
+        .chain { sub_flow1 }
+        .chain do
+          sub_flow2
+            .chain do
+              sub_sub_flow1.chain { sub_sub_sub_flow1 }
+            end
+            .chain { sub_sub_flow2 }
+            .when_truthy { true }.dam { 'errr' }
+            .chain { sub_sub_flow3 }
+        end
+        .chain { sub_flow3 }
     end
 
-    it 'is not called on the flow itself when dammed' do
-      expect(wf).to_not receive(:reverse_flow)
+    it 'does not trigger reverse_flow on initial dammed flow' do
+      expect(sub_flow2).to_not receive(:reverse_flow)
 
       action
     end
 
-    it 'is not called on parent' do
+    it 'does not trigger reverse_flow on parent_flow' do
       expect(parent_flow).to_not receive(:reverse_flow)
 
       action
     end
 
-    it 'is called on executed sub flows' do
-      expect(executed_sub_flow1).to receive(:reverse_flow)
-      expect(executed_sub_flow2).to receive(:reverse_flow)
-      expect(executed_sub_sub_flow1).to receive(:reverse_flow)
+    it 'is called on all executed sub flows' do
+      expect(sub_sub_flow2).to receive(:reverse_flow).once.ordered
+      expect(sub_sub_flow1).to receive(:reverse_flow).once.ordered
+      expect(sub_sub_sub_flow1).to receive(:reverse_flow).once.ordered
+      expect(sub_flow1).to receive(:reverse_flow).once.ordered
 
       action
     end
 
     it 'is not called on non executed sub flows' do
+      expect(sub_sub_flow3).to_not receive(:reverse_flow)
       expect(sub_flow3).to_not receive(:reverse_flow)
 
       action
