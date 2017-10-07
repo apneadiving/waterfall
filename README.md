@@ -242,6 +242,14 @@ end
 ```
 The huge benefit is that if you call services from services, everything will be rolled back.
 
+### Undo
+
+If you get to dam a flow, this would trigger the `reverse_flow` method in all Services previously executed.
+
+`reverse_flow` is not executed on the service which just failed, consider the `on_dam` hook in this case.
+
+Take this as a hook to undo whatever you need to undo if things go wrong. Yet, you probably do not need to bother about databases inserts: this is the purpose of `with_transaction`.
+
 ### FYI
 
 `Flow` is just an alias for the `Wf` class, so just use the one you prefer :)
