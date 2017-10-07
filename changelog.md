@@ -1,3 +1,7 @@
+===1.2.0
+- Removed `undam`.
+- Introduced `reverse_flow`
+
 ===1.1.0
 - Removed `chain_wf`.
 - Introduced `halt_chain`

@@ -54,12 +54,6 @@ describe Flow do
     expect { wf.dam(nil) }.to raise_error(Waterfall::IncorrectDamArgumentError)
   end
 
-  it 'can be undammed' do
-    wf.dam('error').undam
-    expect(wf.dammed?).to be false
-    expect(wf.error_pool).to eq nil
-  end
-
   it 'can be dammed conditionnaly (falsy)' do
     wf.when_falsy { false }.dam { 'error' }
     expect(wf.dammed?).to be true
@@ -121,6 +115,59 @@ describe Flow do
     it "returns what the block returns" do
       expect(wf.halt_chain { "return value" }).to eq "return value"
     end
+  end
 
+  describe 'reverse_flow' do
+    let(:parent_flow) { Flow.new }
+    let(:sub_flow1)   { Flow.new }
+    let(:sub_flow2)   { Flow.new }
+    let(:sub_flow3)   { Flow.new }
+    let(:sub_sub_flow1) { Flow.new }
+    let(:sub_sub_flow2) { Flow.new }
+    let(:sub_sub_flow3) { Flow.new }
+    let(:sub_sub_sub_flow1) { Flow.new }
+
+    def action
+      parent_flow
+        .chain { sub_flow1 }
+        .chain do
+          sub_flow2
+            .chain do
+              sub_sub_flow1.chain { sub_sub_sub_flow1 }
+            end
+            .chain { sub_sub_flow2 }
+            .when_truthy { true }.dam { 'errr' }
+            .chain { sub_sub_flow3 }
+        end
+        .chain { sub_flow3 }
+    end
+
+    it 'does not trigger reverse_flow on initial dammed flow' do
+      expect(sub_flow2).to_not receive(:reverse_flow)
+
+      action
+    end
+
+    it 'does not trigger reverse_flow on parent_flow' do
+      expect(parent_flow).to_not receive(:reverse_flow)
+
+      action
+    end
+
+    it 'is called on all executed sub flows' do
+      expect(sub_sub_flow2).to receive(:reverse_flow).once.ordered
+      expect(sub_sub_flow1).to receive(:reverse_flow).once.ordered
+      expect(sub_sub_sub_flow1).to receive(:reverse_flow).once.ordered
+      expect(sub_flow1).to receive(:reverse_flow).once.ordered
+
+      action
+    end
+
+    it 'is not called on non executed sub flows' do
+      expect(sub_sub_flow3).to_not receive(:reverse_flow)
+      expect(sub_flow3).to_not receive(:reverse_flow)
+
+      action
+    end
   end
 end

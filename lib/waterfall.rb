@@ -42,12 +42,10 @@ module Waterfall
 
   def dam(obj)
     raise IncorrectDamArgumentError.new("You cant dam with a falsy object") unless obj
-    _wf_run { @error_pool = obj }
-  end
-
-  def undam
-    @error_pool = nil
-    self
+    _wf_run do
+      @error_pool = obj
+      _reverse_flows(true)
+    end
   end
 
   def halt_chain(&block)
@@ -69,6 +67,25 @@ module Waterfall
   def update_outflow(key, value)
     @outflow[key] = value
     self
+  end
+
+  def reverse_flow
+  end
+
+  protected
+
+  def _reverse_flows(skip_self)
+    return if @flow_reversed
+    @flow_reversed = true
+    reverse_flow unless skip_self
+    (@_executed_flows || []).reverse_each do |f|
+      f.send :_reverse_flows, false
+    end
+  end
+
+  def _add_executed_flow(flow)
+    @_executed_flows ||= []
+    @_executed_flows.push(flow)
   end
 
   def _wf_run

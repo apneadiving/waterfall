@@ -24,6 +24,8 @@ module Waterfall
         @root.update_outflow(k, child_waterfall.outflow[v])
       end
 
+      @root.send :_add_executed_flow, child_waterfall
+
       if child_waterfall.dammed?
         @root.dam child_waterfall.error_pool
       end
