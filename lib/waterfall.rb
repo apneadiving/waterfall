@@ -8,7 +8,7 @@ require 'waterfall/predicates/chain'
 
 module Waterfall
 
-  attr_reader :error_pool, :outflow
+  attr_reader :error_pool
 
   class IncorrectDamArgumentError      < StandardError; end
   class IncorrectChainingArgumentError < StandardError; end
@@ -90,7 +90,6 @@ module Waterfall
 
   def _wf_run
     @has_flown = true
-    @outflow ||= OpenStruct.new({})
     yield unless dammed?
     self
   end
