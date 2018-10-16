@@ -1,3 +1,7 @@
+===1.2.1
+- Introduced `Waterfall.with_reversible_flow`, makes `reverse_flow` optionnal, may save memory
+- outflow is now lazy loaded
+
 ===1.2.0
 - Removed `undam`.
 - Introduced `reverse_flow`
