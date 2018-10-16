@@ -169,5 +169,22 @@ describe Flow do
 
       action
     end
+
+    context "without reversible flow" do
+      around do |example|
+        Waterfall.with_reversible_flow = false
+        example.run
+        Waterfall.with_reversible_flow = true
+      end
+
+      it 'doesnt call reverse_flow, ever' do
+        expect(sub_sub_flow2).to_not receive(:reverse_flow)
+        expect(sub_sub_flow1).to_not receive(:reverse_flow)
+        expect(sub_sub_sub_flow1).to_not receive(:reverse_flow)
+        expect(sub_flow1).to_not receive(:reverse_flow)
+
+        action
+      end
+    end
   end
 end

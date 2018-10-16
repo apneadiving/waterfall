@@ -13,6 +13,15 @@ module Waterfall
   class IncorrectDamArgumentError      < StandardError; end
   class IncorrectChainingArgumentError < StandardError; end
 
+  class << self
+    attr_accessor :with_reversible_flow
+  end
+  @with_reversible_flow = true
+
+  def outflow
+    @outflow ||= OpenStruct.new({})
+  end
+
   def when_falsy(&block)
     ::Waterfall::WhenFalsy.new(self).tap do |handler|
       _wf_run { handler.call(&block) }
@@ -75,6 +84,7 @@ module Waterfall
   protected
 
   def _reverse_flows(skip_self)
+    return unless Waterfall.with_reversible_flow
     return if @flow_reversed
     @flow_reversed = true
     reverse_flow unless skip_self
@@ -84,6 +94,7 @@ module Waterfall
   end
 
   def _add_executed_flow(flow)
+    return unless Waterfall.with_reversible_flow
     @_executed_flows ||= []
     @_executed_flows.push(flow)
   end
