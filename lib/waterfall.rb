@@ -6,17 +6,21 @@ require 'waterfall/predicates/when_falsy'
 require 'waterfall/predicates/when_truthy'
 require 'waterfall/predicates/chain'
 
+WATERFALL_PATH = "lib/waterfall.rb"
+
 module Waterfall
 
-  attr_reader :error_pool
+  attr_reader :error_pool, :error_pool_context
 
   class IncorrectDamArgumentError      < StandardError; end
   class IncorrectChainingArgumentError < StandardError; end
 
   class << self
     attr_accessor :with_reversible_flow
+    attr_accessor :caller_locations_length
   end
   @with_reversible_flow = true
+  @caller_locations_length = nil
 
   def outflow
     @outflow ||= OpenStruct.new({})
@@ -49,16 +53,17 @@ module Waterfall
     self
   end
 
-  def dam(obj)
+  def dam(obj, context = nil)
     raise IncorrectDamArgumentError.new("You cant dam with a falsy object") unless obj
     _wf_run do
       @error_pool = obj
+      @error_pool_context = context || _error_pool_context
       _reverse_flows(true)
     end
   end
 
   def halt_chain(&block)
-    yield(outflow, error_pool)
+    yield(outflow, error_pool, error_pool_context)
   end
 
   def dammed?
@@ -78,10 +83,10 @@ module Waterfall
     self
   end
 
+  protected
+
   def reverse_flow
   end
-
-  protected
 
   def _reverse_flows(skip_self)
     return unless Waterfall.with_reversible_flow
@@ -103,6 +108,12 @@ module Waterfall
     @has_flown = true
     yield unless dammed?
     self
+  end
+
+  def _error_pool_context
+    caller_locations(1, Waterfall.caller_locations_length).reject do |line|
+      line.to_s.include?(WATERFALL_PATH)
+    end
   end
 end
 

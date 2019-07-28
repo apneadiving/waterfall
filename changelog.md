@@ -1,3 +1,8 @@
+===1.3.0
+- Introduced `error_pool_context`, providing with the stacktrace leading to the dam
+- changed `on_dam` signature to pass context to the block
+- add `Waterfall.with_reversible_flow` to limit the number of lines of the stacktrace (default is nil: unlimited)
+
 ===1.2.1
 - Introduced `Waterfall.with_reversible_flow`, makes `reverse_flow` optionnal, may save memory
 - outflow is now lazy loaded

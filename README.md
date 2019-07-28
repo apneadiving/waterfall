@@ -53,7 +53,7 @@ Flow.new
     .chain(user1: :user) { FetchUser.new(1) }
     .chain(user2: :user) { FetchUser.new(2) }
     .chain  {|outflow| puts(outflow.user1, outflow.user2)  } # report success
-    .on_dam {|error|   puts(error)      }                    # report error
+    .on_dam {|error, context| puts(error, context) }         # report error
 ```
 
 Which works like:
