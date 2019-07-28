@@ -83,10 +83,10 @@ module Waterfall
     self
   end
 
-  protected
-
   def reverse_flow
   end
+
+  protected
 
   def _reverse_flows(skip_self)
     return unless Waterfall.with_reversible_flow
