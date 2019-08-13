@@ -6,7 +6,7 @@ require 'waterfall/predicates/when_falsy'
 require 'waterfall/predicates/when_truthy'
 require 'waterfall/predicates/chain'
 
-WATERFALL_PATH = "lib/waterfall.rb"
+WATERFALL_PATH = "lib/waterfall"
 
 module Waterfall
 
