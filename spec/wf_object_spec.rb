@@ -42,12 +42,14 @@ describe Flow do
   it 'isnt dammed by default' do
     expect(wf.dammed?).to be false
     expect(wf.error_pool).to eq nil
+    expect(wf.error_pool_context).to be nil
   end
 
   it 'is dammed if you dam it!' do
     wf.dam('error')
     expect(wf.dammed?).to be true
     expect(wf.error_pool).to eq 'error'
+    expect(wf.error_pool_context).to be_an Array
   end
 
   it 'dam raises if falsy argument sent' do
@@ -64,6 +66,15 @@ describe Flow do
     wf.when_truthy { true }.dam { 'error' }
     expect(wf.dammed?).to be true
     expect(wf.error_pool).to eq 'error'
+  end
+
+  it 'error pool and context values propagate to root flow' do
+    sub_flow = Flow.new
+    sub_flow.chain { sub_flow.dam('errr')  }
+    wf.chain { sub_flow }
+
+    expect(wf).to be_dammed
+    expect(wf.error_pool_context).to eq sub_flow.error_pool_context
   end
 
   it 'doesnt execute chain blocks once dammed' do
@@ -85,9 +96,10 @@ describe Flow do
     expect(listener).to have_received :failure
   end
 
-  it 'on_dam blocks yield error pool, outflow and waterfall' do
-    wf.dam('errr').on_dam do |error_pool, outflow, waterfall|
+  it 'on_dam blocks yield error pool, error context, outflow and waterfall' do
+    wf.dam('errr').on_dam do |error_pool, error_pool_context, outflow, waterfall|
       expect(error_pool).to eq wf.error_pool
+      expect(error_pool_context).to eq wf.error_pool_context
       expect(outflow).to eq wf.outflow
       expect(waterfall).to eq wf
     end
@@ -106,9 +118,10 @@ describe Flow do
     end
 
     it "yields expected values even if dammed" do
-      wf.chain(:foo) { 1 }.dam("errr").halt_chain do |outflow, error_pool|
+      wf.chain(:foo) { 1 }.dam("errr").halt_chain do |outflow, error_pool, error_pool_context|
         expect(outflow).to    eq wf.outflow
         expect(error_pool).to eq wf.error_pool
+        expect(error_pool_context).to eq wf.error_pool_context
       end
     end
 

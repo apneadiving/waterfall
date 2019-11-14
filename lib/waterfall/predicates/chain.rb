@@ -27,7 +27,7 @@ module Waterfall
       @root.send :_add_executed_flow, child_waterfall
 
       if child_waterfall.dammed?
-        @root.dam child_waterfall.error_pool
+        @root.dam child_waterfall.error_pool, child_waterfall.error_pool_context
       end
 
       self
