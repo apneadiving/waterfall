@@ -133,7 +133,11 @@ instead of
 Flow.new
     .chain { MyWaterfall.new.call }
 ```
-Both are the same: if a block returns a waterfall which was not executed, it will execute it (hence the `call` convention)
+
+Both are not really the same: 
+- the only source of information for the gem is the return value of the block
+- if it returns a `Waterfall`, it will apply chaining logic. If ever the waterfall was not executed yet, it will trigger `call`, hence the convention.
+- if you call your waterfall object inside the block, the return value would be whatever your `call` method returns. So the gem doesnt know there was a waterfall involved and cannot apply chaining logic... unless you ensure `self` is always returned, which is cumbersome, so it's better to avoid this
 
 
 Syntax advice
